@@ -1,0 +1,203 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Mustfile.epx - IPv6-Only Deployment Manifest
+# Authority-first deployment specification following must-spec
+#
+# This file governs physical state transitions for the ipv6-only project.
+# Every operation is treated as a state transition where resources are
+# consumed to produce outputs.
+#
+# Reference: https://github.com/hyperpolymath/mustfile
+
+# =============================================================================
+# PROJECT METADATA
+# =============================================================================
+
+[project]
+name = "ipv6-only"
+version = "0.1.0"
+tier = 2
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/hyperpolymath/ipv6-only"
+
+# =============================================================================
+# BUILD REQUIREMENTS
+# =============================================================================
+
+[requirements]
+# Primary toolchain - Rust
+rust = { version = ">=1.70.0", channel = "stable" }
+cargo = { version = ">=1.70.0" }
+
+# Configuration - Nickel
+nickel = { version = ">=1.0.0", optional = true }
+
+# Task runner - Just
+just = { version = ">=1.0.0" }
+
+# Container runtime - Podman (or nerdctl)
+podman = { version = ">=4.0.0", optional = true }
+
+# =============================================================================
+# ALLOWED TOOLING (RSR Compliance)
+# =============================================================================
+
+[allowed]
+languages = [
+    "rust",
+    "rescript",
+    "bash",
+    "posix-shell",
+    "nickel",
+    "guile-scheme",
+]
+
+runtimes = [
+    "deno",
+]
+
+package-managers = [
+    "cargo",
+    "guix",
+    "nix",
+]
+
+# =============================================================================
+# BANNED TOOLING (RSR Anti-Patterns)
+# =============================================================================
+
+[banned]
+# These are explicitly prohibited and will cause deployment failures
+languages = [
+    "typescript",
+    "go",
+    "python",  # except SaltStack contexts
+    "java",
+    "kotlin",
+    "swift",
+]
+
+runtimes = [
+    "node",
+    "bun",
+]
+
+package-managers = [
+    "npm",
+    "yarn",
+    "pnpm",
+]
+
+files = [
+    "Makefile",
+    "*.mk",
+    "package-lock.json",
+    "yarn.lock",
+    "bun.lockb",
+    "pnpm-lock.yaml",
+    "tsconfig.json",
+    "go.mod",
+    "go.sum",
+]
+
+# =============================================================================
+# STATE TRANSITIONS
+# =============================================================================
+
+[transitions]
+
+# Build transition: source -> binary
+[transitions.build]
+inputs = ["src/**/*.rs", "Cargo.toml", "Cargo.lock"]
+outputs = ["target/release/ipv6"]
+command = "cargo build --release"
+reversible = true  # can clean and rebuild
+
+# Test transition: source -> test results
+[transitions.test]
+inputs = ["src/**/*.rs", "crates/**/*.rs"]
+outputs = ["test-results.json"]
+command = "cargo test --message-format=json"
+reversible = true
+
+# Container build: source -> image
+[transitions.container]
+inputs = ["Containerfile", "target/release/ipv6"]
+outputs = ["ipv6-only:latest"]
+command = "podman build -f Containerfile -t ipv6-only:latest ."
+reversible = true  # can remove image
+
+# Config validation: nickel -> validated
+[transitions.config]
+inputs = ["config/*.ncl"]
+outputs = ["config/generated/*.json"]
+command = "nickel export < config/ipv6-tools.ncl > config/generated/config.json"
+reversible = true
+
+# =============================================================================
+# DEPLOYMENT TARGETS
+# =============================================================================
+
+[targets]
+
+[targets.local]
+description = "Local development environment"
+transitions = ["build", "test"]
+
+[targets.container]
+description = "Container-based deployment"
+transitions = ["build", "container"]
+
+[targets.release]
+description = "Full release build"
+transitions = ["test", "build", "container"]
+
+# =============================================================================
+# VALIDATION HOOKS
+# =============================================================================
+
+[hooks]
+
+# Pre-deployment validation
+[hooks.pre-deploy]
+commands = [
+    "just rsr-check",
+    "just fmt-check",
+    "just lint",
+]
+
+# Post-deployment validation
+[hooks.post-deploy]
+commands = [
+    "just test",
+]
+
+# =============================================================================
+# ENVIRONMENT CONFIGURATION
+# =============================================================================
+
+[environment]
+# Required environment variables
+required = []
+
+# Optional environment variables with defaults
+optional = [
+    { name = "RUST_LOG", default = "info" },
+    { name = "IPV6_CONFIG_PATH", default = "./config/ipv6-tools.ncl" },
+]
+
+# =============================================================================
+# SECURITY POLICIES
+# =============================================================================
+
+[security]
+# No hardcoded secrets allowed
+no-secrets = true
+
+# HTTPS only for external URLs
+https-only = true
+
+# No MD5/SHA1 for security purposes
+deprecated-hashes = ["md5", "sha1"]
+
+# SHA-pinned dependencies preferred
+pin-dependencies = true

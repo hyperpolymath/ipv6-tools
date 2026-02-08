@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Vulnerability
+    url: https://github.com/Hyperpolymath/ipv6-only/security/advisories/new
+    about: Please report security vulnerabilities through GitHub Security Advisories (private)
+  - name: Questions & Discussions
+    url: https://github.com/Hyperpolymath/ipv6-only/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: Documentation
+    url: https://github.com/Hyperpolymath/ipv6-only/tree/main/docs
+    about: Browse project documentation and guides

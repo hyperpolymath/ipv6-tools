@@ -1,0 +1,64 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# IPv6-Only Tools Container
+# Based on Chainguard Wolfi for minimal attack surface
+
+# Build stage
+FROM cgr.dev/chainguard/rust:latest AS builder
+
+WORKDIR /build
+
+# Copy source files
+COPY Cargo.toml Cargo.lock ./
+COPY crates/ ./crates/
+COPY src/ ./src/
+
+# Build release binary
+RUN cargo build --release
+
+# Runtime stage
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+LABEL maintainer="IPv6-Only Project <ipv6@hyperpolymath.org>"
+LABEL description="IPv6-only networking tools written in Rust"
+LABEL org.opencontainers.image.source="https://github.com/hyperpolymath/ipv6-only"
+LABEL org.opencontainers.image.description="Comprehensive IPv6-only networking toolkit"
+LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
+LABEL version="0.1.0"
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    iproute2 \
+    iputils \
+    bind-tools \
+    curl \
+    ca-certificates
+
+# Create non-root user
+RUN adduser -D -u 1000 ipv6tools
+USER ipv6tools
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /build/target/release/ipv6 /usr/local/bin/ipv6
+
+# Copy shell scripts
+COPY --chown=ipv6tools:ipv6tools scripts/*.sh /app/scripts/
+COPY --chown=ipv6tools:ipv6tools src/scripts/*.sh /app/src/scripts/
+
+# Create directories for data
+RUN mkdir -p /app/data /app/config
+
+# Set environment variables
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Default command
+ENTRYPOINT ["/usr/local/bin/ipv6"]
+CMD ["--help"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD /usr/local/bin/ipv6 --version || exit 1
+
+# Volume for persistent data
+VOLUME ["/app/data", "/app/config"]

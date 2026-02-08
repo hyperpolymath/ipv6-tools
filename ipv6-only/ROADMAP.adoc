@@ -1,0 +1,398 @@
+= ipv6-only Roadmap
+:toc: macro
+:toc-title: Contents
+:toclevels: 2
+:icons: font
+
+Development roadmap for the ipv6-only toolkit.
+
+toc::[]
+
+== Current State (v0.1.0)
+
+=== Completed Features
+
+==== Core Library (`ipv6-only-core`)
+
+[cols="1,3,1"]
+|===
+|Feature |Description |Status
+
+|IPv6Address type
+|Full IPv6 address parsing, validation, and manipulation
+|Done
+
+|IPv6Network type
+|CIDR network handling with prefix operations
+|Done
+
+|Zone ID support
+|Link-local addresses with interface zones (`fe80::1%eth0`)
+|Done
+
+|Address type detection
+|Loopback, link-local, ULA, global, multicast identification
+|Done
+
+|Format conversion
+|Compressed, expanded, binary, hexadecimal representations
+|Done
+
+|Serde serialization
+|JSON/YAML serialization support
+|Done
+|===
+
+==== Utilities (`ipv6-only-utils`)
+
+[cols="1,3,1"]
+|===
+|Feature |Description |Status
+
+|Address compression
+|Convert expanded to shortest form
+|Done
+
+|Address expansion
+|Convert compressed to full form
+|Done
+
+|Link-local generation
+|Generate `fe80::/10` addresses
+|Done
+
+|ULA generation
+|Generate `fd00::/8` Unique Local Addresses
+|Done
+
+|Random address generation
+|Generate random addresses within a prefix
+|Done
+
+|MAC to EUI-64
+|Convert MAC addresses to IPv6 link-local
+|Done
+
+|Reverse DNS PTR
+|Generate `.ip6.arpa` pointer records
+|Done
+
+|Subnet mask calculation
+|Calculate netmask for prefix length
+|Done
+
+|Validation functions
+|Validate addresses and networks with error messages
+|Done
+|===
+
+==== Subnet Calculator (`ipv6-only-subnet`)
+
+[cols="1,3,1"]
+|===
+|Feature |Description |Status
+
+|Network info
+|Display network address, first/last, prefix, count
+|Done
+
+|Subnet division
+|Divide network into N subnets
+|Done
+
+|Prefix division
+|Divide network by new prefix length
+|Done
+
+|Supernet calculation
+|Aggregate to larger network
+|Done
+
+|Address containment
+|Check if address is within network
+|Done
+
+|Network overlap
+|Check if two networks overlap
+|Done
+
+|Department allocation
+|Recommend subnet allocation for departments
+|Done
+|===
+
+==== CLI Application
+
+[cols="1,3,1"]
+|===
+|Feature |Description |Status
+
+|`ipv6 calc`
+|Subnet calculator commands
+|Done
+
+|`ipv6 validate`
+|Address and network validation
+|Done
+
+|`ipv6 generate`
+|Address generation (link-local, ULA, random, from-mac)
+|Done
+
+|`ipv6 convert`
+|Format conversion (compress, expand, reverse, binary, hex)
+|Done
+
+|`ipv6 analyze`
+|Address analysis and property display
+|Done
+
+|JSON output
+|`--format json` for all commands
+|Done
+|===
+
+==== Integration
+
+[cols="1,3,1"]
+|===
+|Feature |Description |Status
+
+|HE tunnel setup
+|Hurricane Electric TunnelBroker configuration
+|Done
+
+|HE endpoint update
+|Dynamic IP endpoint updates
+|Done
+
+|HE status check
+|Tunnel connectivity status
+|Done
+
+|HE cert check
+|Certificate validation
+|Done
+
+|Nickel configuration
+|Comprehensive configuration file
+|Done
+|===
+
+==== Documentation
+
+[cols="1,3,1"]
+|===
+|Feature |Description |Status
+
+|IPv6 Primer
+|Educational content on IPv6 fundamentals
+|Done
+
+|Tutorial
+|Step-by-step usage guide
+|Done
+
+|Justfile cookbook
+|Build and development recipes
+|Done
+|===
+
+== Phase 2: Network Operations
+
+=== Planned Features
+
+==== DNS Tools
+
+* [ ] AAAA record lookup
+* [ ] Reverse DNS lookup (PTR)
+* [ ] DNS64 synthesis detection
+* [ ] DNSSEC validation for IPv6
+
+==== Connectivity Testing
+
+* [ ] ICMPv6 ping implementation
+* [ ] Traceroute6 implementation
+* [ ] Path MTU discovery
+* [ ] Neighbor discovery inspection
+
+==== Network Scanning
+
+* [ ] Port scanning for IPv6 hosts
+* [ ] Service detection
+* [ ] Rate-limited scanning
+* [ ] Output formats (JSON, CSV)
+
+==== Address Discovery
+
+* [ ] Multicast neighbor discovery
+* [ ] Router advertisement parsing
+* [ ] DHCPv6 client information
+* [ ] SLAAC address detection
+
+== Phase 3: Advanced Features
+
+=== Security Tools
+
+* [ ] IPv6 firewall rule generation
+* [ ] Extension header analysis
+* [ ] Fragmentation attack detection
+* [ ] RA Guard verification
+* [ ] NDP security analysis
+
+=== Network Planning
+
+* [ ] Visual subnet map generation
+* [ ] Address plan documentation generator
+* [ ] Allocation tracking database
+* [ ] Conflict detection
+* [ ] Utilization reporting
+
+=== Protocol Analysis
+
+* [ ] Packet capture analysis
+* [ ] Flow monitoring
+* [ ] Traffic statistics
+* [ ] Anomaly detection
+
+== Phase 4: Integrations
+
+=== Cloud Provider Integration
+
+* [ ] AWS VPC IPv6 configuration
+* [ ] GCP IPv6 network setup
+* [ ] Azure IPv6 support
+* [ ] Terraform provider
+
+=== Container/Orchestration
+
+* [ ] Kubernetes IPv6 networking
+* [ ] Docker IPv6 configuration
+* [ ] Podman IPv6 support
+* [ ] CNI plugin development
+
+=== Monitoring
+
+* [ ] Prometheus metrics export
+* [ ] Grafana dashboard templates
+* [ ] SNMP IPv6 MIB support
+* [ ] Alerting rules
+
+== Phase 5: Enterprise Features
+
+=== Multi-tenancy
+
+* [ ] Organization-based allocation
+* [ ] RBAC for address management
+* [ ] Audit logging
+* [ ] API access tokens
+
+=== Automation
+
+* [ ] REST API server
+* [ ] gRPC interface
+* [ ] Webhook notifications
+* [ ] Event-driven allocation
+
+=== Reporting
+
+* [ ] Allocation reports
+* [ ] Usage analytics
+* [ ] Compliance checking
+* [ ] Export formats (PDF, XLSX)
+
+== Technical Debt
+
+=== Code Quality
+
+* [ ] Increase test coverage to 90%+
+* [ ] Add property-based testing
+* [ ] Fuzzing for parsers
+* [ ] Benchmark suite
+
+=== Documentation
+
+* [ ] API documentation (rustdoc)
+* [ ] Architecture documentation
+* [ ] Contribution guide
+* [ ] Security policy
+
+=== Infrastructure
+
+* [ ] CI/CD pipeline enhancements
+* [ ] Release automation
+* [ ] Package distribution (crates.io)
+* [ ] Cross-platform builds
+
+== Release Plan
+
+=== v0.2.0
+
+Focus: DNS and connectivity tools
+
+* DNS lookup utilities
+* ICMPv6 ping implementation
+* Traceroute6 implementation
+* Enhanced error handling
+
+=== v0.3.0
+
+Focus: Network scanning and discovery
+
+* Port scanner
+* Neighbor discovery
+* RA parsing
+* Service detection
+
+=== v0.4.0
+
+Focus: Security tools
+
+* Firewall rule generation
+* Extension header analysis
+* Security auditing
+* Vulnerability detection
+
+=== v1.0.0
+
+Focus: Stability and enterprise readiness
+
+* API stability guarantee
+* Full documentation
+* Production hardening
+* Performance optimization
+
+== Contributing
+
+See link:CONTRIBUTING.md[Contributing Guide] for how to help with roadmap items.
+
+=== Priority Items
+
+Looking for contributors on:
+
+1. DNS tool implementation
+2. ICMPv6/ping functionality
+3. Test coverage improvements
+4. Documentation enhancements
+
+=== How to Contribute
+
+1. Pick an item from the roadmap
+2. Open an issue to discuss approach
+3. Submit a pull request
+4. Include tests and documentation
+
+== Notes
+
+=== Design Principles
+
+* Pure Rust implementation (no C dependencies)
+* Zero-copy parsing where possible
+* Async-ready architecture
+* WASM compatibility considered
+
+=== Non-Goals
+
+* IPv4 support (this is ipv6-**only**)
+* GUI application (CLI and library focus)
+* Windows-specific features (POSIX-first)

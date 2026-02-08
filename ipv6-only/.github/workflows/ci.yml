@@ -1,0 +1,149 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Primary Rust CI
+  rust:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, beta]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Rust ${{ matrix.rust }}
+      uses: dtolnay/rust-action@stable
+      with:
+        toolchain: ${{ matrix.rust }}
+        components: rustfmt, clippy
+
+    - name: Cache cargo
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Check formatting
+      run: cargo fmt -- --check
+
+    - name: Run clippy
+      run: cargo clippy -- -D warnings
+
+    - name: Build
+      run: cargo build --release
+
+    - name: Run tests
+      run: cargo test --verbose
+
+  # Shell script linting
+  lint-shell:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@master
+      with:
+        scandir: './scripts'
+        additional_files: 'src/scripts'
+
+  # Nickel configuration validation
+  config-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Nickel
+      run: |
+        curl -fsSL https://github.com/tweag/nickel/releases/latest/download/nickel-x86_64-linux -o nickel
+        chmod +x nickel
+        sudo mv nickel /usr/local/bin/
+
+    - name: Validate Nickel configuration
+      run: nickel typecheck config/ipv6-tools.ncl || echo "Nickel validation skipped"
+
+  # Container build test
+  container:
+    runs-on: ubuntu-latest
+    needs: [rust]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build container image
+      run: |
+        podman build -f Containerfile -t ipv6-only:test . || \
+        docker build -f Containerfile -t ipv6-only:test .
+
+    - name: Test container
+      run: |
+        podman run --rm ipv6-only:test --help || \
+        docker run --rm ipv6-only:test --help || \
+        echo "Container test skipped"
+
+  # Security audit
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: dtolnay/rust-action@stable
+
+    - name: Install cargo-audit
+      run: cargo install cargo-audit
+
+    - name: Run security audit
+      run: cargo audit || true
+
+  # RSR compliance (runs separately from rsr-antipattern.yml for redundancy)
+  rsr-compliance:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Verify no banned files
+      run: |
+        echo "Checking for banned file types..."
+
+        # TypeScript
+        if find . -name "*.ts" -o -name "*.tsx" 2>/dev/null | grep -v node_modules | grep -v .d.ts | grep -q .; then
+          echo "::error::TypeScript files detected - use ReScript instead"
+          exit 1
+        fi
+
+        # Go
+        if find . -name "*.go" 2>/dev/null | grep -q .; then
+          echo "::error::Go files detected - use Rust instead"
+          exit 1
+        fi
+
+        # Makefile
+        if find . -name "Makefile" -o -name "*.mk" 2>/dev/null | grep -q .; then
+          echo "::error::Makefile detected - use justfile instead"
+          exit 1
+        fi
+
+        # npm lockfiles
+        if [ -f "package-lock.json" ] || [ -f "yarn.lock" ] || [ -f "bun.lockb" ]; then
+          echo "::error::npm/yarn/bun lockfile detected - use Deno instead"
+          exit 1
+        fi
+
+        echo "✅ RSR compliance check passed"

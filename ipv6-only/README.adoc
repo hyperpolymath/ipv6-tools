@@ -1,0 +1,365 @@
+= ipv6-only
+
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+A comprehensive IPv6-only networking toolkit written in Rust.
+
+toc::[]
+
+== Overview
+
+`ipv6-only` provides a complete set of tools for working in IPv6-only environments:
+
+* **Core Library**: IPv6 address and network types with full manipulation capabilities
+* **CLI Tools**: Command-line utilities for address validation, conversion, generation, and subnet calculation
+* **Tunnel Integration**: Hurricane Electric TunnelBroker setup and management scripts
+* **Educational Resources**: IPv6 primer and tutorial documentation
+
+== Project Status
+
+[cols="1,3,1"]
+|===
+|Component |Description |Status
+
+|`ipv6-only-core`
+|Core IPv6Address and IPv6Network types with parsing, validation, type detection
+|Implemented
+
+|`ipv6-only-utils`
+|Utilities for compression, expansion, generation (link-local, ULA, random), EUI-64, reverse DNS
+|Implemented
+
+|`ipv6-only-subnet`
+|Subnet calculator with division, supernet, containment, overlap detection
+|Implemented
+
+|`ipv6` CLI
+|Full command-line interface with subcommands
+|Implemented
+
+|HE Tunnel Scripts
+|Hurricane Electric tunnel setup, update, and status checking
+|Implemented
+
+|Configuration
+|Nickel-based configuration system
+|Implemented
+|===
+
+== Architecture
+
+[source]
+----
+ipv6-only/
++-- crates/
+|   +-- core/         # IPv6Address, IPv6Network types
+|   +-- utils/        # Address utilities (generation, conversion)
+|   +-- subnet/       # Subnet calculator
++-- src/
+|   +-- main.rs       # CLI application entry point
++-- scripts/          # Hurricane Electric integration
+|   +-- he-tunnel-setup.sh
+|   +-- he-update-endpoint.sh
+|   +-- he-check-status.sh
+|   +-- he-cert-check.sh
++-- config/
+|   +-- ipv6-tools.ncl   # Nickel configuration
++-- docs/
+    +-- IPv6_PRIMER.md   # Educational content
+    +-- TUTORIAL.md      # Usage tutorial
+----
+
+== Installation
+
+=== From Source (Rust)
+
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/ipv6-only.git
+cd ipv6-only
+cargo build --release
+----
+
+=== Using Just
+
+[source,bash]
+----
+just build
+just install
+----
+
+== Usage
+
+=== CLI Commands
+
+==== Validate Addresses
+
+[source,bash]
+----
+# Validate single address
+ipv6 validate 2001:db8::1
+
+# Validate multiple addresses
+ipv6 validate 2001:db8::1 fe80::1%eth0 ::1
+
+# Validate networks
+ipv6 validate --network 2001:db8::/32
+
+# Quiet mode (exit code only)
+ipv6 validate --quiet 2001:db8::1
+----
+
+==== Subnet Calculator
+
+[source,bash]
+----
+# Network information
+ipv6 calc 2001:db8::/32 --info
+
+# Divide into N subnets
+ipv6 calc 2001:db8::/32 --divide 16
+
+# Divide by new prefix length
+ipv6 calc 2001:db8::/32 --prefix 48
+
+# Get supernet
+ipv6 calc 2001:db8::/48 --supernet 32
+
+# Check address containment
+ipv6 calc 2001:db8::/32 --contains 2001:db8::1
+
+# JSON output
+ipv6 calc 2001:db8::/32 --info --format json
+----
+
+==== Generate Addresses
+
+[source,bash]
+----
+# Generate link-local address
+ipv6 generate link-local
+
+# Generate ULA (Unique Local Address)
+ipv6 generate ula
+
+# Generate random address in prefix
+ipv6 generate random --prefix 2001:db8::/64
+
+# Convert MAC to IPv6 (EUI-64)
+ipv6 generate from-mac 00:11:22:33:44:55
+
+# Generate multiple
+ipv6 generate link-local --count 10
+----
+
+==== Convert Formats
+
+[source,bash]
+----
+# Compress address
+ipv6 convert 2001:0db8:0000:0000:0000:0000:0000:0001 --compress
+
+# Expand address
+ipv6 convert 2001:db8::1 --expand
+
+# Generate reverse DNS PTR
+ipv6 convert 2001:db8::1 --reverse
+
+# Binary representation
+ipv6 convert 2001:db8::1 --binary
+
+# All formats
+ipv6 convert 2001:db8::1 --all
+----
+
+==== Analyze Address
+
+[source,bash]
+----
+ipv6 analyze 2001:db8::1
+# Output:
+# Address: 2001:db8::1
+# Type: Global Unicast
+# Expanded: 2001:0db8:0000:0000:0000:0000:0000:0001
+#
+# Properties:
+#   Loopback:     false
+#   Link-Local:   false
+#   Unique Local: false
+#   Multicast:    false
+#   Global:       true
+#   Unspecified:  false
+----
+
+=== Library Usage
+
+[source,rust]
+----
+use ipv6_only_core::{IPv6Address, IPv6Network};
+use ipv6_only_utils::{compress_address, generate_link_local};
+use ipv6_only_subnet::IPv6SubnetCalculator;
+
+// Parse and manipulate addresses
+let addr = IPv6Address::new("2001:db8::1")?;
+println!("Type: {}", addr.address_type());
+println!("Compressed: {}", addr.compressed());
+println!("Expanded: {}", addr.exploded());
+
+// Network operations
+let net = IPv6Network::new("2001:db8::/32")?;
+println!("Contains 2001:db8::1: {}", net.contains(&addr));
+
+// Subnet calculation
+let calc = IPv6SubnetCalculator::new("2001:db8::/32")?;
+let subnets = calc.divide_into_subnets(4)?;
+for subnet in subnets {
+    println!("{}", subnet.network);
+}
+----
+
+=== Hurricane Electric Tunnel
+
+[source,bash]
+----
+# Initial setup
+sudo ./scripts/he-tunnel-setup.sh <tunnel-id> <username> <update-key>
+
+# Update endpoint (for dynamic IP)
+sudo ./scripts/he-update-endpoint.sh <tunnel-id>
+
+# Check status
+./scripts/he-check-status.sh
+
+# Certificate verification
+./scripts/he-cert-check.sh
+----
+
+== Core Library Features
+
+=== IPv6Address
+
+* Parse compressed and expanded formats
+* Zone ID support (`fe80::1%eth0`)
+* Address type detection (loopback, link-local, ULA, global, multicast)
+* Format conversion (compressed, expanded, binary, hex)
+* Serialization support (serde)
+
+=== IPv6Network
+
+* CIDR notation parsing
+* Network/broadcast address calculation
+* Subnet division and supernet aggregation
+* Address containment and overlap testing
+* Address enumeration for small networks
+
+=== Utilities
+
+* Address compression and expansion
+* Link-local address generation
+* ULA (Unique Local Address) generation
+* Random address generation within prefix
+* MAC to IPv6 (EUI-64) conversion
+* Reverse DNS PTR record generation
+* Subnet mask calculation
+
+== Address Types Supported
+
+[cols="1,2,1"]
+|===
+|Type |Prefix |Example
+
+|Loopback
+|`::1/128`
+|`::1`
+
+|Link-Local
+|`fe80::/10`
+|`fe80::1`
+
+|Unique Local (ULA)
+|`fc00::/7`
+|`fd00::1`
+
+|Global Unicast
+|`2000::/3`
+|`2001:db8::1`
+
+|Multicast
+|`ff00::/8`
+|`ff02::1`
+
+|Documentation
+|`2001:db8::/32`
+|`2001:db8:1234::1`
+|===
+
+== Configuration
+
+The project uses Nickel for configuration. See `config/ipv6-tools.ncl`:
+
+[source,nickel]
+----
+{
+  network = {
+    default_prefix = "2001:db8::/32",
+    prefixes = {
+      site = 48,
+      subnet = 64,
+      host = 128,
+    },
+  },
+
+  scanning = {
+    common_ports = [22, 80, 443],
+    timeout = 2,
+    max_workers = 50,
+  },
+}
+----
+
+== Documentation
+
+* link:docs/IPv6_PRIMER.md[IPv6 Primer] - Comprehensive IPv6 introduction
+* link:docs/TUTORIAL.md[Tutorial] - Step-by-step usage guide
+* link:ROADMAP.adoc[Roadmap] - Development roadmap
+
+== Development
+
+=== Build
+
+[source,bash]
+----
+cargo build
+cargo test
+cargo clippy
+----
+
+=== Test
+
+[source,bash]
+----
+# Run all tests
+cargo test
+
+# Run specific crate tests
+cargo test -p ipv6-only-core
+cargo test -p ipv6-only-utils
+cargo test -p ipv6-only-subnet
+----
+
+== License
+
+PMPL-1.0-or-later
+
+== References
+
+* https://tools.ietf.org/html/rfc8200[RFC 8200] - IPv6 Specification
+* https://tools.ietf.org/html/rfc4291[RFC 4291] - IPv6 Addressing Architecture
+* https://tools.ietf.org/html/rfc4862[RFC 4862] - SLAAC
+* https://tools.ietf.org/html/rfc4193[RFC 4193] - Unique Local Addresses
+* https://ipv6.he.net/[Hurricane Electric IPv6]

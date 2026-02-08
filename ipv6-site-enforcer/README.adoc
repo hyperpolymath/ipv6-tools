@@ -1,0 +1,180 @@
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+image:https://img.shields.io/badge/Philosophy-Palimpsest-indigo.svg[Palimpsest,link="https://github.com/hyperpolymath/palimpsest-license"]
+
+
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2025 Hyperpolymath <hyperpolymath@proton.me>
+= ipv6-site-enforcer
+
+:icons: font
+:toc: left
+:toclevels: 3
+
+== Purpose
+
+Tools and configurations to enforce IPv6-only ingress and service routing across the FlatRacoon Network Stack.
+
+Part of the link:https://github.com/hyperpolymath/flatracoon-netstack[FlatRacoon Network Stack].
+
+== Architecture
+
+[source]
+----
+                Internet (Dual-Stack)
+                         │
+              ┌──────────▼──────────┐
+              │   IPv6 Ingress      │
+              │   (This Module)     │
+              │   ────────────────  │
+              │   • NAT64/DNS64     │
+              │   • IPv4 rejection  │
+              │   • Happy Eyeballs  │
+              └──────────┬──────────┘
+                         │ IPv6 only
+       ┌─────────────────┼─────────────────┐
+       │                 │                 │
+┌──────▼──────┐   ┌──────▼──────┐   ┌──────▼──────┐
+│  Services   │   │  ZeroTier   │   │    IPFS     │
+│  (K8s)      │   │  Overlay    │   │   Nodes     │
+└─────────────┘   └─────────────┘   └─────────────┘
+----
+
+== Components
+
+* **NAT64/DNS64 gateway** - Jool-based translation for legacy clients
+* **IPv6 ingress controller** - Nginx/Envoy configured for v6-only
+* **Policy enforcement** - NetworkPolicy manifests rejecting IPv4
+* **Monitoring hooks** - Prometheus metrics for v4 rejection counts
+* **Happy Eyeballs support** - RFC 8305 compliant client handling
+
+== Directory Structure
+
+[source]
+----
+ipv6-site-enforcer/
+├── manifests/
+│   ├── nat64-deployment.yaml
+│   ├── dns64-configmap.yaml
+│   ├── ingress-controller.yaml
+│   └── networkpolicy-v6only.yaml
+├── configs/
+│   ├── jool.ncl              # NAT64 configuration
+│   ├── dns64.ncl             # DNS64 resolver config
+│   ├── ingress.ncl           # Ingress controller settings
+│   └── policy.ncl            # Network policy rules
+├── scripts/
+│   ├── enforce-v6.sh         # Runtime enforcement
+│   ├── audit-v4.sh           # Detect IPv4 leakage
+│   └── metrics.sh            # Collect rejection metrics
+├── Justfile
+├── README.adoc
+├── STATE.scm
+├── META.scm
+└── ECOSYSTEM.scm
+----
+
+== Inputs
+
+[cols="1,2,1"]
+|===
+| Input | Description | Source
+
+| IPv6 prefix
+| Allocated /48 or /64 for services
+| Network administrator
+
+| NAT64 prefix
+| 64:ff9b::/96 or custom
+| Configuration
+
+| DNS64 upstream
+| Resolver for synthesis
+| Network configuration
+
+| Ingress rules
+| Service exposure policies
+| configs/ingress.ncl
+|===
+
+== Outputs
+
+[cols="1,2"]
+|===
+| Output | Description
+
+| IPv6-only ingress
+| All inbound traffic forced to IPv6
+
+| NAT64 gateway
+| Legacy IPv4 client compatibility
+
+| Rejection metrics
+| IPv4 attempt counts and sources
+
+| Audit logs
+| Compliance reporting
+|===
+
+== Integration Points
+
+=== With FlatRacoon Stack
+
+* **zerotier-k8s-link** - Overlay uses IPv6 addressing
+* **ipfs-overlay** - IPFS nodes bind to IPv6 only
+* **network-dashboard** - v4 rejection metrics displayed
+* **bgp-backbone-lab** - IPv6 route announcements
+
+=== Machine-Readable Manifest
+
+[source,json]
+----
+{
+  "module": "ipv6-site-enforcer",
+  "version": "0.1.0",
+  "layer": "network",
+  "requires": ["kubernetes", "jool", "dns64"],
+  "provides": ["ipv6-only-ingress", "nat64", "dns64"],
+  "config_schema": "configs/schema.ncl",
+  "health_endpoint": "/ipv6/health",
+  "metrics_endpoint": "/ipv6/metrics"
+}
+----
+
+== Quick Start
+
+[source,bash]
+----
+# 1. Deploy NAT64/DNS64 gateway
+just deploy-gateway
+
+# 2. Configure ingress controller
+just configure-ingress
+
+# 3. Apply network policies
+just enforce-policies
+
+# 4. Verify enforcement
+just audit
+----
+
+== IPv6 Addressing Scheme
+
+[source]
+----
+2001:db8:face::/48          # Example allocation
+├── 2001:db8:face:0::/64    # Kubernetes services
+├── 2001:db8:face:1::/64    # ZeroTier overlay
+├── 2001:db8:face:2::/64    # IPFS cluster
+└── 2001:db8:face:ff::/64   # NAT64 pool
+----
+
+== Status
+
+[horizontal]
+Phase:: Scaffolding
+Completion:: 5%
+Next:: NAT64/DNS64 deployment manifests
+
+== License
+
+PMPL-1.0-or-later

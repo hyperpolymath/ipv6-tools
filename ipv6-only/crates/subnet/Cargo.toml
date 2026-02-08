@@ -1,0 +1,8 @@
+[package]
+name = "ipv6-only-subnet"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ipv6-only-core = { path = "../core" }
+serde = { workspace = true }

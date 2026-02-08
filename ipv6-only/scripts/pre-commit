@@ -1,0 +1,62 @@
+#!/bin/sh
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Pre-commit hook for ipv6-only
+# Enforces RSR compliance and code quality
+
+set -e
+
+echo "Running pre-commit checks..."
+
+# RSR Compliance Checks
+echo "Checking RSR compliance..."
+
+# Check for TypeScript
+if find . -name "*.ts" -o -name "*.tsx" 2>/dev/null | grep -v node_modules | grep -v .d.ts | grep -q .; then
+    echo "ERROR: TypeScript files detected - use ReScript instead"
+    exit 1
+fi
+
+# Check for Go
+if find . -name "*.go" 2>/dev/null | grep -q .; then
+    echo "ERROR: Go files detected - use Rust instead"
+    exit 1
+fi
+
+# Check for Makefile
+if find . -name "Makefile" -o -name "*.mk" 2>/dev/null | grep -q .; then
+    echo "ERROR: Makefile detected - use justfile instead"
+    exit 1
+fi
+
+# Check for npm lockfiles
+if [ -f "package-lock.json" ] || [ -f "yarn.lock" ] || [ -f "bun.lockb" ] || [ -f "pnpm-lock.yaml" ]; then
+    echo "ERROR: npm/yarn/bun/pnpm lockfile detected - use Deno instead"
+    exit 1
+fi
+
+# Check for tsconfig.json
+if [ -f "tsconfig.json" ]; then
+    echo "ERROR: tsconfig.json detected - use ReScript instead"
+    exit 1
+fi
+
+echo "RSR compliance: OK"
+
+# Rust checks (if cargo is available)
+if command -v cargo >/dev/null 2>&1; then
+    echo "Running cargo fmt check..."
+    cargo fmt -- --check || {
+        echo "ERROR: Code not formatted. Run 'cargo fmt' first."
+        exit 1
+    }
+
+    echo "Running cargo clippy..."
+    cargo clippy -- -D warnings || {
+        echo "ERROR: Clippy warnings found. Fix them before committing."
+        exit 1
+    }
+
+    echo "Rust checks: OK"
+fi
+
+echo "All pre-commit checks passed!"

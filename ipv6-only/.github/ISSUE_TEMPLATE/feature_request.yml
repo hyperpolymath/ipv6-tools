@@ -1,0 +1,129 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature!
+        
+        **Before submitting:** Please search existing issues and discussions.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve?
+      placeholder: |
+        I'm frustrated when...
+        Current behavior is...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this to work?
+      placeholder: |
+        I would like to...
+        The tool should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternative solutions have you considered?
+      placeholder: |
+        - Option 1: ...
+        - Option 2: ...
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component would this affect?
+      options:
+        - Python Library
+        - Go Tools
+        - Web Server (Deno)
+        - Shell Scripts
+        - Documentation
+        - Build System
+        - Container
+        - New Component
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Critical - Blocking my work
+        - High - Would significantly improve workflow
+        - Medium - Nice to have
+        - Low - Minor convenience
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe your specific use case
+      placeholder: |
+        I need this feature to...
+        My workflow involves...
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Provide examples of how this would work
+      placeholder: |
+        ```bash
+        ipv6-tool new-command --option value
+        ```
+        
+        Or show a code example
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related Issues/PRs
+      description: Link to related issues or pull requests
+      placeholder: |
+        - Related to #123
+        - Similar to #456
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Are you willing to contribute?
+      options:
+        - label: I am willing to implement this feature
+        - label: I am willing to help test this feature
+        - label: I can provide additional details if needed
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched for existing feature requests
+          required: true
+        - label: I have read the [Contributing Guidelines](../CONTRIBUTING.md)
+          required: true
+        - label: This feature aligns with the project goals
+          required: true

@@ -1,0 +1,1112 @@
+= Justfile Cookbook
+IPv6-Only Tools Project
+:toc: left
+:toclevels: 3
+:icons: font
+:source-highlighter: pygments
+:experimental:
+
+== Introduction
+
+This cookbook provides comprehensive guidance on using the `justfile` automation recipes for the IPv6-Only Tools project. The justfile provides over 100 recipes for building, testing, deploying, and managing the project.
+
+== Quick Start
+
+=== Basic Commands
+
+List all available recipes:
+[source,bash]
+----
+just
+just --list
+----
+
+Get help for a specific recipe:
+[source,bash]
+----
+just --show <recipe-name>
+----
+
+Run a recipe:
+[source,bash]
+----
+just <recipe-name>
+----
+
+== Setup & Installation
+
+=== Complete Environment Setup
+
+Complete development environment setup in one command:
+[source,bash]
+----
+just setup
+----
+
+This recipe:
+
+* Installs system dependencies
+* Sets up Python environment
+* Installs Deno runtime
+* Installs Nickel language
+* Configures Podman
+* Verifies all installations
+
+=== Individual Component Installation
+
+Install only specific components:
+
+[source,bash]
+----
+# Python only
+just install-python
+
+# Python with dev dependencies
+just install-dev
+
+# Deno runtime
+just install-deno
+
+# Nickel language
+just install-nickel
+
+# Podman and Wolfi base image
+just setup-podman
+----
+
+=== Verification
+
+Verify your setup:
+[source,bash]
+----
+just verify-setup
+----
+
+== Python Development
+
+=== Running Tests
+
+Basic test execution:
+[source,bash]
+----
+# All Python tests
+just test-python
+
+# Verbose output
+just test-python-verbose
+
+# Specific test file
+just test-file test_address.py
+
+# With additional pytest args
+just test-python "-k test_validation"
+----
+
+=== Coverage
+
+Generate coverage reports:
+[source,bash]
+----
+# Generate coverage
+just coverage
+
+# Generate and open in browser
+just coverage-view
+
+# Coverage with specific args
+just coverage "--cov-report=xml"
+----
+
+=== Watch Mode
+
+Auto-run tests on file changes:
+[source,bash]
+----
+just watch-tests
+----
+
+== Go Development
+
+=== Building Tools
+
+Build all Go tools:
+[source,bash]
+----
+just build-go
+----
+
+Build individual tools:
+[source,bash]
+----
+just build-ping    # IPv6 ping
+just build-scan    # Network scanner
+just build-trace   # Traceroute
+just build-lookup  # DNS lookup
+----
+
+Binaries are created in `bin/` directory.
+
+=== Advanced Builds
+
+Build with race detector:
+[source,bash]
+----
+just build-go-race
+----
+
+=== Testing Go Code
+
+[source,bash]
+----
+# Run tests
+just test-go
+
+# With coverage
+just test-go-coverage
+----
+
+== ReScript & Deno Web Development
+
+=== Building Web Application
+
+Build the ReScript web application:
+[source,bash]
+----
+just build-rescript
+----
+
+=== Development Server
+
+Start development server:
+[source,bash]
+----
+# Default port 8000
+just serve-web
+
+# Custom port
+just serve-web 3000
+----
+
+=== Watch Mode
+
+Auto-rebuild on changes:
+[source,bash]
+----
+just watch-rescript
+----
+
+=== Bundling
+
+Create production bundle:
+[source,bash]
+----
+just bundle-web
+----
+
+=== Code Quality
+
+[source,bash]
+----
+# Check formatting
+just check-deno
+
+# Format code
+just fmt-deno
+
+# Lint
+just lint-deno
+----
+
+== Code Quality & Linting
+
+=== Comprehensive Linting
+
+Run all linters:
+[source,bash]
+----
+just lint
+----
+
+This runs:
+
+* Python (flake8, pylint)
+* Go (go vet, golint)
+* Shell scripts (shellcheck)
+* Deno/TypeScript
+
+=== Individual Linters
+
+[source,bash]
+----
+just lint-python
+just lint-go
+just lint-shell
+just lint-deno
+----
+
+=== Formatting
+
+Format all code:
+[source,bash]
+----
+just format
+----
+
+Format specific languages:
+[source,bash]
+----
+just format-python  # Black + isort
+just format-go      # gofmt
+just fmt-deno       # Deno fmt
+----
+
+=== Type Checking
+
+[source,bash]
+----
+just typecheck-python
+----
+
+=== Security Scanning
+
+[source,bash]
+----
+# All security checks
+just security
+
+# Python only (Bandit + Safety)
+just security-python
+
+# Go only (gosec)
+just security-go
+----
+
+== Benchmarking & Performance
+
+=== Running Benchmarks
+
+[source,bash]
+----
+# Standard benchmark (10,000 iterations)
+just benchmark
+
+# Custom iteration count
+just benchmark 50000
+
+# Quick benchmark
+just benchmark-quick
+
+# Full benchmark with comparisons
+just benchmark-full
+----
+
+=== Profiling
+
+Profile Python code:
+[source,bash]
+----
+just profile examples/network_planning.py
+----
+
+=== Go Benchmarks
+
+[source,bash]
+----
+just benchmark-go
+----
+
+== Podman Container Operations
+
+=== Building Containers
+
+Build container with Chainguard Wolfi base:
+[source,bash]
+----
+# Default tag 'latest'
+just container-build
+
+# Custom tag
+just container-build v1.0.0
+----
+
+=== Running Containers
+
+[source,bash]
+----
+# Interactive shell
+just container-run
+
+# With IPv6 networking enabled
+just container-run-ipv6
+
+# Custom tag
+just container-run v1.0.0
+----
+
+=== Container Management
+
+Execute command in running container:
+[source,bash]
+----
+just container-exec "ipv6-validate 2001:db8::1"
+----
+
+Push to registry:
+[source,bash]
+----
+just container-push docker.io/username v1.0.0
+----
+
+Scan for vulnerabilities:
+[source,bash]
+----
+just container-scan latest
+----
+
+Export container:
+[source,bash]
+----
+just container-export latest backup.tar
+----
+
+Clean up:
+[source,bash]
+----
+just container-clean
+----
+
+== Nickel Configuration Management
+
+=== Generating Configurations
+
+Generate configs from Nickel templates:
+[source,bash]
+----
+just config-generate
+----
+
+This creates JSON and YAML outputs in `config/generated/`.
+
+=== Validation
+
+Validate Nickel configuration:
+[source,bash]
+----
+just config-validate
+----
+
+=== Querying
+
+Query specific configuration fields:
+[source,bash]
+----
+just config-query "network.prefix"
+just config-query "dns.servers"
+----
+
+=== Network Configs
+
+Generate network-specific configurations:
+[source,bash]
+----
+just config-network headquarters
+just config-network datacenter-1
+----
+
+== Documentation
+
+=== Building Documentation
+
+Build all AsciiDoc documentation:
+[source,bash]
+----
+just docs-build
+----
+
+Build specific document:
+[source,bash]
+----
+just docs-build-file tutorial
+----
+
+Build as PDF:
+[source,bash]
+----
+just docs-pdf
+----
+
+=== Watch Mode
+
+Auto-rebuild docs on changes:
+[source,bash]
+----
+just docs-watch
+----
+
+=== Validation
+
+Validate AsciiDoc syntax:
+[source,bash]
+----
+just docs-validate
+----
+
+=== Man Pages
+
+Generate man pages:
+[source,bash]
+----
+just docs-man
+----
+
+=== Local Preview
+
+Serve docs locally:
+[source,bash]
+----
+# Default port 8080
+just docs-serve
+
+# Custom port
+just docs-serve 9000
+----
+
+== Testing & Validation
+
+=== Comprehensive Testing
+
+Run all tests:
+[source,bash]
+----
+just test
+----
+
+This includes:
+
+* Python unit tests
+* Go tests
+* Integration tests
+
+=== Integration Tests
+
+[source,bash]
+----
+just test-integration
+----
+
+=== End-to-End Tests
+
+[source,bash]
+----
+just test-e2e
+----
+
+=== CLI Tool Tests
+
+[source,bash]
+----
+just test-cli
+----
+
+=== Web Interface Tests
+
+[source,bash]
+----
+just test-web
+----
+
+=== Example Validation
+
+Ensure all examples run without errors:
+[source,bash]
+----
+just test-examples
+----
+
+== Hurricane Electric Integration
+
+=== Tunnel Setup
+
+Setup HE IPv6 tunnel:
+[source,bash]
+----
+just he-setup <tunnel-id> <username> <password>
+----
+
+=== Update Endpoint
+
+Update dynamic endpoint:
+[source,bash]
+----
+just he-update-endpoint <tunnel-id>
+----
+
+=== Status Check
+
+Check tunnel status:
+[source,bash]
+----
+just he-status
+----
+
+=== Certification
+
+Check IPv6 Sage certification progress:
+[source,bash]
+----
+just he-cert-status <username>
+----
+
+=== Connectivity Test
+
+Test HE tunnel connectivity:
+[source,bash]
+----
+just he-test
+----
+
+== Network Operations
+
+=== Diagnostics
+
+Comprehensive diagnostics:
+[source,bash]
+----
+# Full diagnostics (requires sudo)
+just diag
+
+# Quick check
+just diag-quick
+----
+
+=== Network Configuration
+
+[source,bash]
+----
+# Show current config
+just net-show
+
+# Enable IPv6
+just net-enable
+
+# Enable privacy extensions
+just net-privacy
+
+# Configure static address
+just net-static eth0 2001:db8::10 64
+----
+
+=== Scanning
+
+Scan network for hosts:
+[source,bash]
+----
+just net-scan 2001:db8::/64
+----
+
+=== Connectivity Testing
+
+[source,bash]
+----
+# Default 4 pings
+just net-ping 2001:db8::1
+
+# Custom count
+just net-ping 2001:db8::1 10
+----
+
+== CLI Tool Operations
+
+=== Subnet Calculator
+
+[source,bash]
+----
+# Basic info
+just calc 2001:db8::/32 --info
+
+# Divide into subnets
+just calc 2001:db8::/32 --divide 16
+
+# Custom prefix
+just calc 2001:db8::/32 --prefix 36
+
+# Check membership
+just calc 2001:db8::/32 --contains 2001:db8::1
+----
+
+=== Address Validation
+
+[source,bash]
+----
+just validate 2001:db8::1 fe80::1 ::1
+----
+
+=== Address Generation
+
+[source,bash]
+----
+# Link-local
+just generate link-local
+
+# ULA
+just generate ula
+
+# From MAC
+just generate from-mac 00:11:22:33:44:55
+
+# Random in prefix
+just generate random --prefix 2001:db8::/64
+
+# Multiple addresses
+just generate link-local --count 10
+----
+
+=== Security Audit
+
+[source,bash]
+----
+just audit 2001:db8::1
+just audit 2001:db8::1 --quick
+just audit 2001:db8::/64 --full
+----
+
+=== DNS Operations
+
+[source,bash]
+----
+just dns google.com
+just dns cloudflare.com --ipv6
+just dns facebook.com --compare
+----
+
+=== Network Simulation
+
+[source,bash]
+----
+# Create simulation
+just simulate 2001:db8::/64
+
+# Custom host count
+just simulate 2001:db8::/64 10
+----
+
+== Examples & Demonstrations
+
+=== Run All Examples
+
+[source,bash]
+----
+just examples
+----
+
+=== Individual Examples
+
+[source,bash]
+----
+just example-basic
+just example-planning
+just example-security
+just example-dns
+----
+
+== Build & Release
+
+=== Build Everything
+
+[source,bash]
+----
+just build
+----
+
+This builds:
+
+* Go binaries
+* ReScript web app
+* Python distribution package
+
+=== Python Distribution
+
+[source,bash]
+----
+just build-python-dist
+----
+
+=== Release Build
+
+Build everything for release:
+[source,bash]
+----
+just build-release
+----
+
+=== Create Release
+
+[source,bash]
+----
+just release 1.0.0
+----
+
+This:
+
+* Creates git tag
+* Builds all components
+* Generates documentation
+* Creates release archive
+
+=== Publishing
+
+Publish to PyPI:
+[source,bash]
+----
+just publish-pypi
+----
+
+== Maintenance & Cleanup
+
+=== Clean Build Artifacts
+
+[source,bash]
+----
+# Standard clean
+just clean
+
+# Deep clean (including dependencies)
+just clean-all
+----
+
+=== Dependency Management
+
+[source,bash]
+----
+# Update all dependencies
+just update-deps
+
+# Check for outdated deps
+just check-deps
+----
+
+== Development Workflows
+
+=== Pre-Commit Checks
+
+Run before committing:
+[source,bash]
+----
+just pre-commit
+----
+
+This runs:
+
+* Code formatting
+* Linting
+* Tests
+* Security checks
+
+=== CI Simulation
+
+Simulate CI pipeline locally:
+[source,bash]
+----
+just ci
+----
+
+=== Release Validation
+
+Full validation before release:
+[source,bash]
+----
+just validate-release
+----
+
+=== Watch Mode Development
+
+Auto-run tests on changes:
+[source,bash]
+----
+just dev-watch
+----
+
+== Reporting & Analytics
+
+=== Test Reports
+
+Generate HTML test report:
+[source,bash]
+----
+just report-tests
+----
+
+Output: `report.html`
+
+=== Coverage Badge
+
+Generate coverage badge:
+[source,bash]
+----
+just report-coverage-badge
+----
+
+Output: `coverage.svg`
+
+=== Complexity Analysis
+
+[source,bash]
+----
+# Cyclomatic complexity
+just report-complexity
+
+# Maintainability index
+just report-maintainability
+----
+
+=== Lines of Code
+
+[source,bash]
+----
+just report-loc
+----
+
+== Utilities
+
+=== Project Statistics
+
+[source,bash]
+----
+just stats
+----
+
+Shows:
+
+* Lines of code
+* File counts
+* Test coverage
+* Documentation stats
+
+=== TODO Tracking
+
+Find TODO comments:
+[source,bash]
+----
+just todos
+----
+
+=== IPv6 Connectivity Check
+
+[source,bash]
+----
+just check-ipv6
+----
+
+=== Environment Info
+
+Display development environment information:
+[source,bash]
+----
+just info
+----
+
+== Advanced Patterns
+
+=== Chaining Recipes
+
+Chain multiple recipes:
+[source,bash]
+----
+just clean && just build && just test
+----
+
+Or use dependencies in the justfile itself.
+
+=== Parallel Execution
+
+Some recipes can run in parallel:
+[source,bash]
+----
+just test-python & just test-go & wait
+----
+
+=== Custom Variables
+
+Pass custom values:
+[source,bash]
+----
+just benchmark ITERATIONS=100000
+just serve-web PORT=3000
+just container-build TAG=dev
+----
+
+=== Conditional Execution
+
+[source,bash]
+----
+just test && just build || echo "Tests failed"
+----
+
+=== Environment Variables
+
+Set environment for recipe execution:
+[source,bash]
+----
+VERBOSE=1 just test
+DEBUG=1 just build
+----
+
+== Troubleshooting
+
+=== Common Issues
+
+.Command not found
+Ensure `just` is installed:
+[source,bash]
+----
+cargo install just
+----
+
+.Permission denied
+Some recipes require sudo:
+[source,bash]
+----
+sudo -E just diag
+----
+
+.Dependency missing
+Run setup:
+[source,bash]
+----
+just setup
+just verify-setup
+----
+
+=== Debug Mode
+
+Run with verbose output:
+[source,bash]
+----
+just --verbose <recipe>
+----
+
+Show recipe without executing:
+[source,bash]
+----
+just --dry-run <recipe>
+----
+
+== Best Practices
+
+=== Development Workflow
+
+Recommended workflow:
+
+[source,bash]
+----
+# 1. Setup environment (once)
+just setup
+
+# 2. Make changes
+# edit files...
+
+# 3. Format and lint
+just format
+just lint
+
+# 4. Run tests
+just test
+
+# 5. Pre-commit check
+just pre-commit
+
+# 6. Build
+just build
+----
+
+=== Testing Strategy
+
+[source,bash]
+----
+# During development
+just dev-watch
+
+# Before committing
+just pre-commit
+
+# Before pushing
+just ci
+
+# Before release
+just validate-release
+----
+
+=== Container Workflow
+
+[source,bash]
+----
+# Build
+just container-build dev
+
+# Test locally
+just container-run dev
+
+# Scan for issues
+just container-scan dev
+
+# Push when ready
+just container-push registry.example.com dev
+----
+
+== Recipe Index
+
+=== Setup
+* `setup` - Complete environment setup
+* `install-python` - Install Python package
+* `install-dev` - Install with dev dependencies
+* `install-deno` - Install Deno
+* `install-nickel` - Install Nickel
+* `setup-podman` - Setup Podman
+* `verify-setup` - Verify installation
+
+=== Testing
+* `test` - Run all tests
+* `test-python` - Python tests
+* `test-go` - Go tests
+* `test-integration` - Integration tests
+* `test-e2e` - End-to-end tests
+* `test-cli` - CLI tool tests
+* `test-web` - Web interface tests
+* `test-examples` - Validate examples
+
+=== Building
+* `build` - Build everything
+* `build-go` - Build Go tools
+* `build-rescript` - Build ReScript app
+* `build-python-dist` - Build Python package
+* `build-release` - Release build
+
+=== Code Quality
+* `lint` - Run all linters
+* `format` - Format all code
+* `security` - Security scans
+* `typecheck-python` - Type checking
+
+=== Containers
+* `container-build` - Build container
+* `container-run` - Run container
+* `container-scan` - Scan container
+* `container-push` - Push to registry
+
+=== Documentation
+* `docs-build` - Build docs
+* `docs-pdf` - Build PDFs
+* `docs-watch` - Watch mode
+* `docs-serve` - Serve locally
+
+=== Operations
+* `diag` - Diagnostics
+* `net-scan` - Network scan
+* `calc` - Calculate subnets
+* `validate` - Validate addresses
+
+== Conclusion
+
+The justfile provides a comprehensive automation framework for the IPv6-Only Tools project. Explore the recipes, combine them creatively, and customize them for your workflow.
+
+For more information, see the main documentation at link:../README.adoc[README.adoc].

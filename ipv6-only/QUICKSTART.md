@@ -1,0 +1,305 @@
+# IPv6-Only Tools - Quick Start Guide
+
+Get started with IPv6-Only Tools in 5 minutes!
+
+## Installation
+
+### Option 1: Install from Source (Rust)
+
+```bash
+git clone https://github.com/hyperpolymath/ipv6-only.git
+cd ipv6-only
+cargo build --release
+
+# Add to PATH
+sudo cp target/release/ipv6 /usr/local/bin/
+```
+
+### Option 2: Using Podman/Docker
+
+```bash
+podman pull ghcr.io/hyperpolymath/ipv6-only:latest
+podman run -it --rm ipv6-only
+```
+
+### Option 3: Using Just
+
+```bash
+just build
+just install  # requires sudo
+```
+
+## First Steps
+
+### 1. Validate an IPv6 Address
+
+```bash
+ipv6 validate 2001:db8::1
+# Output:
+# ✓ 2001:db8::1 is valid
+
+ipv6 validate 2001:db8::1 fe80::1%eth0 ::1
+# Validates multiple addresses
+```
+
+### 2. Analyze an Address
+
+```bash
+ipv6 analyze 2001:db8::1
+# Output:
+# Address: 2001:db8::1
+# Type: Global Unicast
+# Expanded: 2001:0db8:0000:0000:0000:0000:0000:0001
+#
+# Properties:
+#   Loopback:     false
+#   Link-Local:   false
+#   Unique Local: false
+#   Multicast:    false
+#   Global:       true
+```
+
+### 3. Calculate Subnets
+
+```bash
+# Get network information
+ipv6 calc 2001:db8::/32 --info
+
+# Divide into 4 subnets
+ipv6 calc 2001:db8::/32 --divide 4
+
+# Divide by prefix length
+ipv6 calc 2001:db8::/32 --prefix 48
+```
+
+### 4. Generate Addresses
+
+```bash
+# Generate link-local address
+ipv6 generate link-local
+
+# Generate ULA (Unique Local Address)
+ipv6 generate ula
+
+# From MAC address (EUI-64)
+ipv6 generate from-mac 00:11:22:33:44:55
+
+# Random address in prefix
+ipv6 generate random --prefix 2001:db8::/64
+```
+
+### 5. Convert Formats
+
+```bash
+# Compress address
+ipv6 convert 2001:0db8:0000:0000:0000:0000:0000:0001 --compress
+# Output: 2001:db8::1
+
+# Expand address
+ipv6 convert 2001:db8::1 --expand
+# Output: 2001:0db8:0000:0000:0000:0000:0000:0001
+
+# Generate reverse DNS PTR
+ipv6 convert 2001:db8::1 --reverse
+
+# All formats
+ipv6 convert 2001:db8::1 --all
+```
+
+## Library Usage (Rust)
+
+Add to your `Cargo.toml`:
+
+```toml
+[dependencies]
+ipv6-only-core = { git = "https://github.com/hyperpolymath/ipv6-only" }
+ipv6-only-utils = { git = "https://github.com/hyperpolymath/ipv6-only" }
+ipv6-only-subnet = { git = "https://github.com/hyperpolymath/ipv6-only" }
+```
+
+```rust
+use ipv6_only_core::{IPv6Address, IPv6Network};
+use ipv6_only_utils::{compress_address, generate_link_local};
+use ipv6_only_subnet::IPv6SubnetCalculator;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Parse and manipulate addresses
+    let addr = IPv6Address::new("2001:db8::1")?;
+    println!("Type: {}", addr.address_type());
+    println!("Compressed: {}", addr.compressed());
+    println!("Expanded: {}", addr.exploded());
+
+    // Network operations
+    let net = IPv6Network::new("2001:db8::/32")?;
+    println!("Contains 2001:db8::1: {}", net.contains(&addr));
+
+    // Subnet calculation
+    let calc = IPv6SubnetCalculator::new("2001:db8::/32")?;
+    let subnets = calc.divide_into_subnets(4)?;
+    for subnet in subnets {
+        println!("{}", subnet.network);
+    }
+
+    // Generate addresses
+    let link_local = generate_link_local();
+    println!("Link-local: {}", link_local);
+
+    Ok(())
+}
+```
+
+## Diagnostics (requires sudo)
+
+```bash
+# Full diagnostics
+sudo ./src/scripts/ipv6-diag.sh
+
+# Quick connectivity check
+./src/scripts/ipv6-diag.sh --quick
+
+# Show IPv6 configuration
+sudo ./src/scripts/ipv6-config.sh show
+```
+
+## Hurricane Electric Tunnel Setup
+
+```bash
+# Initial setup
+sudo ./scripts/he-tunnel-setup.sh <tunnel-id> <username> <update-key>
+
+# Update endpoint (for dynamic IP)
+sudo ./scripts/he-update-endpoint.sh <tunnel-id>
+
+# Check status
+./scripts/he-check-status.sh
+```
+
+## Using Just Commands
+
+```bash
+# List all commands
+just
+
+# Build
+just build          # Debug build
+just build-release  # Release build
+
+# Test
+just test           # Run all tests
+just test-verbose   # With output
+
+# Quality
+just fmt            # Format code
+just lint           # Run clippy
+just check          # Format + lint
+
+# Run CLI
+just run validate 2001:db8::1
+just run calc 2001:db8::/32 --info
+just run generate link-local
+```
+
+## Common Tasks
+
+### Task 1: Validate a List of Addresses
+
+```bash
+# From command line
+ipv6 validate 2001:db8::1 fe80::1 ::1
+
+# From a file
+cat addresses.txt | xargs ipv6 validate
+
+# Quiet mode (exit code only)
+ipv6 validate --quiet 2001:db8::1 && echo "Valid"
+```
+
+### Task 2: Plan Network Subnets
+
+```bash
+# Get recommendations
+ipv6 calc 2001:db8::/48 --info
+
+# Divide for departments
+ipv6 calc 2001:db8::/48 --divide 16
+
+# Check if address is in network
+ipv6 calc 2001:db8::/32 --contains 2001:db8::1
+```
+
+### Task 3: Check IPv6 Connectivity
+
+```bash
+# Quick check
+just check-ipv6
+
+# Full diagnostics
+just diag
+
+# Network configuration
+just net-show
+```
+
+## Testing
+
+```bash
+# All tests
+just test
+
+# Specific crate
+just test-crate ipv6-only-core
+
+# With coverage
+just test-coverage
+```
+
+## Documentation
+
+- **README**: Overview and installation
+- **Tutorial**: `docs/TUTORIAL.md` - Comprehensive guide
+- **IPv6 Primer**: `docs/IPv6_PRIMER.md` - Learn IPv6 basics
+- **API Docs**: `cargo doc --open`
+- **Contributing**: `CONTRIBUTING.md`
+
+## Getting Help
+
+- **Documentation**: Check `docs/` directory
+- **Issues**: https://github.com/hyperpolymath/ipv6-only/issues
+- **Just commands**: `just --list`
+
+## Next Steps
+
+1. Read the [Tutorial](docs/TUTORIAL.md) for detailed examples
+2. Check out the [IPv6 Primer](docs/IPv6_PRIMER.md) to learn more
+3. Explore the library API with `cargo doc --open`
+4. Set up the pre-commit hooks with `just install-hooks`
+
+## Cheat Sheet
+
+```bash
+# Validate
+ipv6 validate <address>
+
+# Analyze
+ipv6 analyze <address>
+
+# Calculate
+ipv6 calc <network> --info
+ipv6 calc <network> --divide <count>
+ipv6 calc <network> --prefix <length>
+ipv6 calc <network> --contains <address>
+
+# Generate
+ipv6 generate link-local
+ipv6 generate ula
+ipv6 generate from-mac <mac>
+ipv6 generate random --prefix <prefix>
+
+# Convert
+ipv6 convert <address> --compress
+ipv6 convert <address> --expand
+ipv6 convert <address> --reverse
+ipv6 convert <address> --all
+```
+
+Happy IPv6 networking!
