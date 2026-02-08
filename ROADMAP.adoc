@@ -1,0 +1,66 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= IPv6 Tools Roadmap
+:toc:
+:toclevels: 3
+
+== Overview
+
+IPv6 Tools is a monorepo containing network administration and security tools focused on IPv6 policy enforcement.
+
+== Components
+
+=== ipv6-only (50% complete)
+
+*Status:* Active development +
+*Purpose:* IPv6-only network enforcement tool
+
+*Current features:*
+- Basic network detection
+- IPv4 traffic blocking rules
+
+*Planned improvements:*
+- Enhanced policy configuration
+- Integration with systemd-networkd
+- Comprehensive logging
+
+=== ipv6-site-enforcer (30% complete)
+
+*Status:* Early development +
+*Purpose:* Site-wide IPv6 policy enforcer for enterprise networks
+
+*Current features:*
+- Policy definition framework
+- Basic enforcement engine
+
+*Planned improvements:*
+- Multi-site policy distribution
+- Real-time monitoring dashboard
+- Compliance reporting
+
+== Milestones
+
+=== Phase 1: Core Functionality (Q1 2026)
+- [x] Repository structure
+- [ ] Complete ipv6-only CLI
+- [ ] Policy engine for ipv6-site-enforcer
+- [ ] Unit test coverage >80%
+
+=== Phase 2: Integration (Q2 2026)
+- [ ] systemd integration
+- [ ] NetworkManager support
+- [ ] Documentation and examples
+
+=== Phase 3: Enterprise Features (Q3 2026)
+- [ ] Multi-site deployment
+- [ ] Monitoring and alerting
+- [ ] Policy templates library
+
+== Dependencies
+
+- Rust toolchain (stable)
+- Linux kernel >=5.15 (for network filtering)
+- systemd (optional, for service integration)
+
+== Contributing
+
+See link:CONTRIBUTING.md[Contributing Guidelines].
