@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ipv6-enforcer-config
+  namespace: ipv6-enforcer
+  labels:
+    app.kubernetes.io/name: ipv6-site-enforcer
+    app.kubernetes.io/part-of: flatracoon
+data:
+  nat64-prefix: "64:ff9b::/96"
+
+  unbound.conf: |
+    server:
+      interface: 0.0.0.0
+      interface: ::0
+      access-control: 0.0.0.0/0 allow
+      access-control: ::/0 allow
+
+      # DNS64 synthesis: map IPv4 addresses into the NAT64 prefix
+      module-config: "dns64 validator iterator"
+      dns64-prefix: 64:ff9b::/96
+      dns64-synthall: yes
+
+      # Performance tuning
+      num-threads: 2
+      msg-cache-size: 16m
+      rrset-cache-size: 32m
+
+      # Logging
+      verbosity: 1
+      log-queries: no
+      log-replies: no
+
+    # Forward to cluster DNS for internal resolution
+    forward-zone:
+      name: "cluster.local."
+      forward-addr: 10.96.0.10
+
+    # Forward everything else to public DNS
+    forward-zone:
+      name: "."
+      forward-addr: 2606:4700:4700::1111
+      forward-addr: 2606:4700:4700::1001

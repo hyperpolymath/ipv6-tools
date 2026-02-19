@@ -1,20 +1,8 @@
 ;; SPDX-License-Identifier: PMPL-1.0-or-later
-;; ECOSYSTEM.scm - Ecosystem position for ipv6-site-enforcer
-;; Media-Type: application/vnd.ecosystem+scm
-
-(ecosystem
-  (version "1.0")
-  (name "ipv6-site-enforcer")
-  (type "")
-  (purpose "")
-
-  (position-in-ecosystem
-    (category "")
-    (subcategory "")
-    (unique-value ()))
-
-  (related-projects ())
-
-  (what-this-is ())
-
-  (what-this-is-not ()))
+(ecosystem (metadata (version "0.2.0") (last-updated "2026-02-08"))
+  (project (name "ipv6-site-enforcer") (purpose "IPv6 enforcement with NAT64/DNS64") (role network-enforcement))
+  (flatracoon-integration
+    (parent "flatracoon/netstack")
+    (layer network)
+    (depended-on-by ())
+    (depends-on ("hesiod-dns-map"))))

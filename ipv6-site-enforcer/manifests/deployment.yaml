@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Jool NAT64 + Unbound DNS64 sidecar deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipv6-site-enforcer
+  namespace: ipv6-enforcer
+  labels:
+    app.kubernetes.io/name: ipv6-site-enforcer
+    app.kubernetes.io/component: nat64-dns64
+    app.kubernetes.io/part-of: flatracoon
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ipv6-site-enforcer
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ipv6-site-enforcer
+    spec:
+      containers:
+        - name: jool-nat64
+          image: ghcr.io/hyperpolymath/jool-nat64:latest
+          ports:
+            - containerPort: 8080
+              name: health
+              protocol: TCP
+          env:
+            - name: NAT64_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: ipv6-enforcer-config
+                  key: nat64-prefix
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+
+        - name: unbound-dns64
+          image: mvance/unbound:latest
+          ports:
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+          volumeMounts:
+            - name: unbound-config
+              mountPath: /opt/unbound/etc/unbound/unbound.conf
+              subPath: unbound.conf
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+      volumes:
+        - name: unbound-config
+          configMap:
+            name: ipv6-enforcer-config
+            items:
+              - key: unbound.conf
+                path: unbound.conf

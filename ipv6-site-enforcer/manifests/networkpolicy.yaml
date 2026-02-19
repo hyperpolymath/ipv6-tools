@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ipv6-site-enforcer
+  namespace: ipv6-enforcer
+  labels:
+    app.kubernetes.io/name: ipv6-site-enforcer
+    app.kubernetes.io/part-of: flatracoon
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ipv6-site-enforcer
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow DNS queries from any namespace
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+        - port: 8080
+          protocol: TCP
+  egress:
+    # Allow DNS forwarding to cluster DNS and public resolvers
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow NAT64 translated traffic (HTTP/HTTPS)
+    - ports:
+        - port: 80
+          protocol: TCP
+        - port: 443
+          protocol: TCP
