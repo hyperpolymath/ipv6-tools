@@ -1,31 +1,86 @@
 <!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
 <!-- TOPOLOGY.md — Project architecture map and completion dashboard -->
-<!-- Last updated: 2026-02-14 -->
+<!-- Last updated: 2026-02-19 -->
 
-# TOPOLOGY — ipv6-tools
+# IPv6 Tools — Project Topology
 
 ## System Architecture
 
 ```
-ipv6-tools/
-├── .machine_readable/    # RSR state files (STATE, META, ECOSYSTEM, etc.)
-├── .github/workflows/    # CI/CD (17 standard workflows)
-├── ipv6-only/            # IPv6-only network policy
-├── ipv6-site-enforcer/   # Site-level IPv6 enforcement tool
-├── contractiles/         # K9, dust, lust, must, trust contractiles
-├── README.adoc           # Overview
-└── Justfile              # Task runner
+                        ┌─────────────────────────────────────────┐
+                        │              NETWORK TRAFFIC            │
+                        │        (Dual-stack / Transition)        │
+                        └───────────────────┬─────────────────────┘
+                                            │
+                                            ▼
+                        ┌─────────────────────────────────────────┐
+                        │           IPv6 POLICY ENGINE            │
+                        │                                         │
+                        │  ┌───────────┐  ┌───────────────────┐  │
+                        │  │ ipv6-only │  │ ipv6-site-        │  │
+                        │  │ Policy    │  │ enforcer          │  │
+                        │  └─────┬─────┘  └────────┬──────────┘  │
+                        └────────│─────────────────│──────────────┘
+                                 │                 │
+                                 ▼                 ▼
+                        ┌─────────────────────────────────────────┐
+                        │           NETWORK INTERFACE             │
+                        │      (ip6tables, nftables, BGP)         │
+                        └───────────────────┬─────────────────────┘
+                                            │
+                                            ▼
+                        ┌─────────────────────────────────────────┐
+                        │          IPv6-ONLY SUBSTRATE            │
+                        │      (No IPv4, SLAAC, DHCPv6)           │
+                        └─────────────────────────────────────────┘
+
+                        ┌─────────────────────────────────────────┐
+                        │          REPO INFRASTRUCTURE            │
+                        │  Justfile Automation  .machine_readable/  │
+                        │  .bot_directives/     0-AI-MANIFEST.a2ml  │
+                        └─────────────────────────────────────────┘
 ```
 
 ## Completion Dashboard
 
-| Component | Status | Progress |
-|-----------|--------|----------|
-| RSR Structure | Active | `████████░░` 80% |
-| ipv6-only | Active | `██████░░░░` 60% |
-| ipv6-site-enforcer | Active | `██████░░░░` 60% |
-| Documentation | Active | `██████░░░░` 60% |
+```
+COMPONENT                          STATUS              NOTES
+─────────────────────────────────  ──────────────────  ─────────────────────────────────
+CORE TOOLING
+  ipv6-only Policy                  ██████████ 100%    Transition rules stable
+  ipv6-site-enforcer                ████████░░  80%    Monitoring logic refining
+  Neighbor Discovery Audit          ██████░░░░  60%    ICMPv6 checks active
+
+INFRASTRUCTURE
+  Justfile Automation               ██████████ 100%    Standard build/lint tasks
+  .machine_readable/                ██████████ 100%    STATE tracking active
+  0-AI-MANIFEST.a2ml                ██████████ 100%    AI entry point verified
+
+REPO INFRASTRUCTURE
+  .bot_directives/                  ██████████ 100%    Policy hygiene rules
+  Test Suite                        ██████░░░░  60%    Connectivity tests expanding
+
+─────────────────────────────────────────────────────────────────────────────
+OVERALL:                            ████████░░  ~80%   IPv6 toolset stable
+```
 
 ## Key Dependencies
 
-- RSR Template: `rsr-template-repo`
+```
+ipv6-only Policy ───► ipv6-site-enforcer ───► Network Audit ───► Compliance
+     │                      │                    │
+     ▼                      ▼                    ▼
+ip6tables Config ─────► Interface ───────────► Traffic Filter
+```
+
+## Update Protocol
+
+This file is maintained by both humans and AI agents. When updating:
+
+1. **After completing a component**: Change its bar and percentage
+2. **After adding a component**: Add a new row in the appropriate section
+3. **After architectural changes**: Update the ASCII diagram
+4. **Date**: Update the `Last updated` comment at the top of this file
+
+Progress bars use: `█` (filled) and `░` (empty), 10 characters wide.
+Percentages: 0%, 10%, 20%, ... 100% (in 10% increments).

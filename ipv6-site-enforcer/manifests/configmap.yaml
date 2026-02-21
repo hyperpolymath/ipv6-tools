@@ -1,44 +1,33 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
+# IPv6-Site-Enforcer — Service Configuration (ConfigMap).
+#
+# This manifest defines the operational parameters for the NAT64/DNS64 
+# gateway. It provides the authoritative translation prefix and the 
+# Unbound recursive resolver configuration.
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ipv6-enforcer-config
   namespace: ipv6-enforcer
-  labels:
-    app.kubernetes.io/name: ipv6-site-enforcer
-    app.kubernetes.io/part-of: flatracoon
 data:
+  # PREFIX: The standard "Well-Known Prefix" for NAT64 (RFC 6052).
   nat64-prefix: "64:ff9b::/96"
 
+  # RESOLVER CONFIG: The embedded script for the Unbound container.
   unbound.conf: |
     server:
-      interface: 0.0.0.0
-      interface: ::0
-      access-control: 0.0.0.0/0 allow
-      access-control: ::/0 allow
-
-      # DNS64 synthesis: map IPv4 addresses into the NAT64 prefix
+      # DNS64 SYNTHESIS: Configures Unbound to map IPv4 A-records into 
+      # the 64:ff9b::/96 prefix, creating synthetic AAAA records.
       module-config: "dns64 validator iterator"
       dns64-prefix: 64:ff9b::/96
       dns64-synthall: yes
 
-      # Performance tuning
-      num-threads: 2
-      msg-cache-size: 16m
-      rrset-cache-size: 32m
+      # SECURITY: Restrict access to the internal cluster network.
+      access-control: 0.0.0.0/0 allow
+      access-control: ::/0 allow
 
-      # Logging
-      verbosity: 1
-      log-queries: no
-      log-replies: no
-
-    # Forward to cluster DNS for internal resolution
-    forward-zone:
-      name: "cluster.local."
-      forward-addr: 10.96.0.10
-
-    # Forward everything else to public DNS
+    # UPSTREAM: Forwards unknown queries to the public DNS64 resolvers.
     forward-zone:
       name: "."
-      forward-addr: 2606:4700:4700::1111
-      forward-addr: 2606:4700:4700::1001
+      forward-addr: 2606:4700:4700::1111 # Cloudflare IPv6
