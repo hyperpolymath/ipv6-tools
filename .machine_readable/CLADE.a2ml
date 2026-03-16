@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Clade declaration — part of the gv-clade-index registry
+# See: https://github.com/hyperpolymath/gv-clade-index
+
+[identity]
+uuid = "75a311de-579c-5063-85a6-63b8c5b8014e"
+primary-forge = "github"
+primary-owner = "hyperpolymath"
+canonical-name = "ipv6-tools"
+prefixed-name = "ix-ipv6-tools"
+
+[clade]
+primary = "ix"
+secondary = []
+assigned = "2026-03-16"
+rationale = ""
+
+[forges]
+github = "hyperpolymath/ipv6-tools"
+gitlab = "hyperpolymath/ipv6-tools"
+bitbucket = "hyperpolymath/ipv6-tools"
+
+[lineage]
+type = "standalone"
+parent = "IPv6 networking tools"
+born = "2026-03-16"
