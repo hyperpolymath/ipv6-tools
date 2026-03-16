@@ -6,6 +6,7 @@
 //! and subnet calculation. It is designed to support the "IPv6-Only" mandate 
 //! of the FlatRacoon ecosystem.
 
+#![forbid(unsafe_code)]
 use clap::{Parser, Subcommand};
 // ... [Crate imports]
 

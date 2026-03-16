@@ -12,6 +12,7 @@
 //! 3. **Reverse Pointer**: Generates the nibble-based `.ip6.arpa` name required 
 //!    for IPv6 reverse DNS resolution.
 
+#![forbid(unsafe_code)]
 use ipv6_only_core::{IPv6Address, IPv6Network, Ipv6Error, Result};
 use rand::Rng;
 use std::net::Ipv6Addr;

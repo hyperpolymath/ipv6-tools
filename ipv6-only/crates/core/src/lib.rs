@@ -10,6 +10,7 @@
 //! 3. **Manipulation**: Rich support for CIDR-based network creation and 
 //!    recursive subnet division.
 
+#![forbid(unsafe_code)]
 use serde::{Deserialize, Serialize};
 use std::net::Ipv6Addr;
 use thiserror::Error;

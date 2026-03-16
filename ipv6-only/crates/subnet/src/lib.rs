@@ -4,6 +4,7 @@
 //! space. it handles the complex arithmetic of 128-bit address 
 //! manipulation to produce valid, non-overlapping subnets.
 
+#![forbid(unsafe_code)]
 use ipv6_only_core::{IPv6Network, Ipv6Error, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
