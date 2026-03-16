@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: PMPL-1.0-or-later
 # Mustfile.epx - IPv6-Only Deployment Manifest
 # Authority-first deployment specification following must-spec
 #
@@ -16,7 +16,7 @@
 name = "ipv6-only"
 version = "0.1.0"
 tier = 2
-license = "AGPL-3.0-or-later"
+license = "PMPL-1.0-or-later"
 repository = "https://github.com/hyperpolymath/ipv6-only"
 
 # =============================================================================
