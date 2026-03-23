@@ -2,7 +2,7 @@
 # IPv6-Site-Enforcer — Deployment Automation.
 #
 # This justfile provides the operational recipes for managing the 
-//! IPv6 transition gateway within a Kubernetes cluster.
+# IPv6 transition gateway within a Kubernetes cluster.
 
 # LIST: Displays available deployment tasks.
 default:
