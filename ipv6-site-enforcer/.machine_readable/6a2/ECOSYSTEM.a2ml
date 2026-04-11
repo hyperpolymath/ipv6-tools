@@ -1,8 +1,20 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-(ecosystem (metadata (version "0.2.0") (last-updated "2026-02-08"))
-  (project (name "ipv6-site-enforcer") (purpose "IPv6 enforcement with NAT64/DNS64") (role network-enforcement))
-  (flatracoon-integration
-    (parent "flatracoon/netstack")
-    (layer network)
-    (depended-on-by ())
-    (depends-on ("hesiod-dns-map"))))
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# ECOSYSTEM.a2ml — Ipv6 Site Enforcer ecosystem position
+[metadata]
+version = "0.2.0"
+last-updated = "2026-02-08"
+
+[project]
+name = "Ipv6 Site Enforcer"
+purpose = "IPv6 enforcement with NAT64/DNS64"
+role = ""
+
+[position-in-ecosystem]
+category = ""
+
+[related-projects]
+projects = [
+  # No related projects recorded
+]
