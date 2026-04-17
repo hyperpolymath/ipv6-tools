@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+// (PMPL-1.0-or-later preferred; MPL-2.0 required for crates.io)
 //! IPv6 Subnet Calculator — Network Planning Engine.
 //!
 //! This crate provides high-level utilities for partitioning IPv6 address 
