@@ -8,7 +8,7 @@ IPv6-Only Tools Project
 
 == Introduction
 
-This cookbook provides comprehensive guidance on using the `justfile` automation recipes for the IPv6-Only Tools project. The justfile provides over 100 recipes for building, testing, deploying, and managing the project.
+This cookbook provides comprehensive guidance on using the `justfile` automation recipes for the IPv6-Only Tools project. The Justfile provides over 100 recipes for building, testing, deploying, and managing the project.
 
 == Quick Start
 
@@ -915,7 +915,7 @@ Chain multiple recipes:
 just clean && just build && just test
 ----
 
-Or use dependencies in the justfile itself.
+Or use dependencies in the Justfile itself.
 
 === Parallel Execution
 
@@ -1107,6 +1107,6 @@ just container-push registry.example.com dev
 
 == Conclusion
 
-The justfile provides a comprehensive automation framework for the IPv6-Only Tools project. Explore the recipes, combine them creatively, and customize them for your workflow.
+The Justfile provides a comprehensive automation framework for the IPv6-Only Tools project. Explore the recipes, combine them creatively, and customize them for your workflow.
 
 For more information, see the main documentation at link:../README.adoc[README.adoc].

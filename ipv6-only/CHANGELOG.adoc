@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Python library (ipv6tools package) - replaced by Rust crates
 - Go tools - replaced by Rust implementation
 - Web application references - not yet implemented
-- Makefile - replaced by justfile
+- Makefile - replaced by Justfile
 - npm/node dependencies - use Deno if needed
 
 == [0.1.0] - 2024-12-26
