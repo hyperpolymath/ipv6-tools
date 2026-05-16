@@ -12,7 +12,7 @@ echo "Checking RSR compliance..."
 
 # Check for TypeScript
 if find . -name "*.ts" -o -name "*.tsx" 2>/dev/null | grep -v node_modules | grep -v .d.ts | grep -q .; then
-    echo "ERROR: TypeScript files detected - use ReScript instead"
+    echo "ERROR: TypeScript files detected - use AffineScript instead"
     exit 1
 fi
 
@@ -36,7 +36,7 @@ fi
 
 # Check for tsconfig.json
 if [ -f "tsconfig.json" ]; then
-    echo "ERROR: tsconfig.json detected - use ReScript instead"
+    echo "ERROR: tsconfig.json detected - use AffineScript instead"
     exit 1
 fi
 
