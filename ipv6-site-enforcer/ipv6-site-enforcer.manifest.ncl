@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # ipv6-site-enforcer module manifest for FlatRacoon orchestrator
 #
 # This module implements the "Danger Zone" network policy: 

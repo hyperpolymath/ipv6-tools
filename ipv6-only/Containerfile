@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # IPv6-Only Tools Container
 # Based on Chainguard Wolfi for minimal attack surface
 
@@ -22,7 +22,7 @@ LABEL maintainer="IPv6-Only Project <ipv6@hyperpolymath.org>"
 LABEL description="IPv6-only networking tools written in Rust"
 LABEL org.opencontainers.image.source="https://github.com/hyperpolymath/ipv6-only"
 LABEL org.opencontainers.image.description="Comprehensive IPv6-only networking toolkit"
-LABEL org.opencontainers.image.licenses="PMPL-1.0-or-later"
+LABEL org.opencontainers.image.licenses="MPL-2.0"
 LABEL version="0.1.0"
 
 # Install runtime dependencies

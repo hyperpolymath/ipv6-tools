@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Template: QUICKSTART-USER.adoc — 5-minute path to working software
 // Replace ipv6-tools, Ipv6 Tools — See README.adoc for details., just run, Ipv6 Tools started successfully. with actuals
 = ipv6-tools — Quick Start for Users

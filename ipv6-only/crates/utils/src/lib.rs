@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-// (PMPL-1.0-or-later preferred; MPL-2.0 required for crates.io)
+// (MPL-2.0 preferred; MPL-2.0 required for crates.io)
 //! IPv6 Utilities — High-Assurance Address Manipulation.
 //!
 //! This crate implements the core numerical logic for the IPv6-Only project. 

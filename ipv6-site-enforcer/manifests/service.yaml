@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # IPv6-Site-Enforcer — Service Definition.
 #
 # This manifest exposes the NAT64/DNS64 gateway within the cluster. 
