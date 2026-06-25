@@ -1,0 +1,62 @@
+<!--
+SPDX-License-Identifier: CC-BY-SA-4.0
+SPDX-FileCopyrightText: 2025-2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
+
+IPv6 policy enforcement and tooling for the hyperpolymath ecosystem.
+
+This monorepo consolidates two adjacent IPv6 utilities into a single
+operational unit (shared CI, shared license, shared dependency state).
+
+# Components
+
+`ipv6-only/`  
+IPv6-only network policy. Enforces that an environment (a node, a
+namespace, a deployment) does not fall back to IPv4 — surfacing
+mis-configurations rather than letting them degrade silently. See the
+directory’s own README for invocation.
+
+`ipv6-site-enforcer/`  
+Site-level enforcement tool. Validates that a public-facing site serves
+IPv6 correctly (AAAA records, IPv6 socket bind, HTTP-over-IPv6).
+Suitable for periodic CI / monitoring use.
+
+The two pair naturally: `ipv6-only` enforces locally,
+`ipv6-site-enforcer` enforces externally.
+
+# Quickstart
+
+```bash
+git clone git@github.com:hyperpolymath/ipv6-tools.git
+cd ipv6-tools
+
+# ipv6-only:
+cd ipv6-only/ && just build && just test
+
+# ipv6-site-enforcer:
+cd ../ipv6-site-enforcer/ && just build && just run -- example.com
+```
+
+# Status
+
+- **Licence**: MPL-2.0. (Migrated from PMPL-1.0-or-later 2026-05-26 per
+  the estate licence-debt audit, hyperpolymath/standards#196.)
+
+- **Estate role**: infrastructure tooling — consumed by deployment
+  workflows where IPv6 readiness is a hard requirement.
+
+- **Audit findings**: see `docs/tech-debt-2026-05-26.md` if present
+  (added by the 2026-05-26 estate tech-debt scan).
+
+# Contributing
+
+See <a href="CONTRIBUTING.md" class="md">CONTRIBUTING</a>. GPG-signed
+commits required.
+
+# Companion repositories
+
+- [`hyperpolymath/standards`](https://github.com/hyperpolymath/standards)
+  — canonical estate-wide standards.
+
+- [`hyperpolymath/zerotier-k8s-link`](https://github.com/hyperpolymath/zerotier-k8s-link)
+  — adjacent network-layer tooling.
