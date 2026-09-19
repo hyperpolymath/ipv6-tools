@@ -364,7 +364,7 @@ Focus: Stability and enterprise readiness
 
 == Contributing
 
-See link:CONTRIBUTING.md[Contributing Guide] for how to help with roadmap items.
+See link:../.github/CONTRIBUTING.md[Contributing Guide] for how to help with roadmap items.
 
 === Priority Items
 
