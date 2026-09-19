@@ -63,4 +63,4 @@ IPv6 Tools is a monorepo containing network administration and security tools fo
 
 == Contributing
 
-See link:CONTRIBUTING.md[Contributing Guidelines].
+See link:.github/CONTRIBUTING.md[Contributing Guidelines].
