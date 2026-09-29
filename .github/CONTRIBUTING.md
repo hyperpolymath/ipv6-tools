@@ -1,121 +1,152 @@
-# Clone the repository
+# Contributing to ipv6-tools
 
-git clone https://github.com/hyperpolymath/ipv6-tools.git
-cd ipv6-tools
+Thank you for your interest in contributing to `ipv6-tools` — IPv6 policy
+enforcement and tooling for the hyperpolymath ecosystem.
 
-# Using Guix (recommended for reproducibility)
+This is the GitHub-detected copy of the contribution guide. It is kept in
+Markdown on purpose: GitHub's Community Standards checklist only recognises
+Markdown for community-health files, even though it renders AsciiDoc. The
+canonical AsciiDoc guide is [`CONTRIBUTING.adoc`](../CONTRIBUTING.adoc);
+the policy and its exceptions are recorded in
+[`docs/documentation-format-policy.adoc`](../docs/documentation-format-policy.adoc).
 
-guix develop
+## Contents
 
-# Or using toolbox/distrobox
+- [Repository layout](#repository-layout)
+- [Development setup](#development-setup)
+- [Making changes](#making-changes)
+- [Documentation format](#documentation-format)
+- [Reporting bugs and requesting features](#reporting-bugs-and-requesting-features)
+- [Perimeter model](#perimeter-model)
 
-toolbox create ipv6-tools-dev
-toolbox enter ipv6-tools-dev
-# Install dependencies manually
-
-# Verify setup
-
-just check   # or: cargo check / mix compile / etc.
-just test    # Run test suite
-
-### Repository Structure
+## Repository layout
 
 ```text
 ipv6-tools/
-├── src/ # Source code (Perimeter 1-2)
-├── lib/ # Library code (Perimeter 1-2)
-├── extensions/ # Extensions (Perimeter 2)
-├── plugins/ # Plugins (Perimeter 2)
-├── tools/ # Tooling (Perimeter 2)
-├── docs/ # Documentation (Perimeter 3)
-│   ├── architecture/ # ADRs, specs (Perimeter 2)
-│   └── proposals/ # RFCs (Perimeter 3)
-├── examples/ # Examples (Perimeter 3)
-├── spec/ # Spec tests (Perimeter 3)
-├── tests/ # Test suite (Perimeter 2-3)
-├── .well-known/ # Protocol files (Perimeter 1-3)
-├── .github/ # GitHub config (Perimeter 1)
-│   ├── CONTRIBUTING.md # This file
-│   ├── ISSUE_TEMPLATE/
-│   └── workflows/
-├── CHANGELOG.md
-├── CODE_OF_CONDUCT.md
-├── GOVERNANCE.md
-├── LICENSE
-├── MAINTAINERS.md
+├── ipv6-only/                  # Rust workspace: IPv6-only policy enforcement
+│   ├── crates/                 # core, subnet, utils
+│   └── docs/                   # primer, tutorial, citations
+├── ipv6-site-enforcer/         # Site-level IPv6 checks + Kubernetes manifests
+│   ├── manifests/              # namespace, configmap, deployment, service, networkpolicy
+│   ├── hooks/                  # workflow validation hooks (SPDX, SHA pins, permissions)
+│   └── contractiles/           # MUST/DUST contracts for this component
+├── docs/                       # Repository documentation
+│   ├── documentation-format-policy.adoc
+│   └── tech-debt-2026-05-26.adoc
+├── tests/                      # Test scaffolding (fuzzing placeholder)
+├── www/.well-known/            # Protocol files served by the site
+├── contractiles/               # MUST/DUST/TRUST/INTENT/ADJUST contracts
+├── .machine_readable/          # Machine-readable state (a2ml, contractiles)
+├── .github/                    # Workflows, CODEOWNERS, this guide
+├── CHANGELOG.adoc
+├── CODE_OF_CONDUCT.adoc
+├── CONTRIBUTING.adoc           # Canonical AsciiDoc contributor guide
+├── GOVERNANCE.adoc
+├── Justfile                    # Task runner (run `just` for the recipe list)
+├── LICENSES/
+├── MAINTAINERS.adoc
 ├── README.adoc
-├── SECURITY.md
-├── flake.nix # Nix flake (Perimeter 1)
-└── Justfile # Task runner (Perimeter 1)
+├── REQUIRES_INITIALISATION.adoc
+├── ROADMAP.adoc
+├── SECURITY.adoc
+├── TEST-NEEDS.adoc
+└── TOPOLOGY.adoc
 ```
 
-    ---
+## Development setup
 
-## How to Contribute
+```bash
+git clone https://github.com/hyperpolymath/ipv6-tools.git
+cd ipv6-tools
 
-### Reporting Bugs
+# Reproducible shell (preferred)
+guix develop            # or: mise install && mise exec -- bash
 
-    **Before reporting**:
-    1. Search existing issues
-    2. Check if it's already fixed in `main`
-    3. Determine which perimeter the bug affects
+# Verify the checkout
+just quality            # fmt-check + clippy + tests
+just validate           # RSR + state + documentation-format checks
+```
 
-    **When reporting**:
+Rust tooling lives under `ipv6-only/`; its workspace parses, has a no_std
+core, and is exercised with:
 
-    Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md) and include:
+```bash
+cd ipv6-only
+cargo fmt --all -- --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+cargo audit --deny warnings
+```
 
-    - Clear, descriptive title
-    - Environment details (OS, versions, toolchain)
-    - Steps to reproduce
-    - Expected vs actual behaviour
-    - Logs, screenshots, or minimal reproduction
+The enforcer side is Kubernetes manifests plus shell hooks; validate with
+`cd ipv6-site-enforcer && just validate`.
 
-### Suggesting Features
+## Making changes
 
-    **Before suggesting**:
-    1. Check the [roadmap](ROADMAP.md) if available
-    2. Search existing issues and discussions
-    3. Consider which perimeter the feature belongs to
+### Branch naming
 
-    **When suggesting**:
+| Prefix | Use |
+| --- | --- |
+| `feat/` | New functionality |
+| `fix/` | Bug fix |
+| `docs/` | Documentation |
+| `refactor/` | Behaviour-preserving change |
+| `ci/` | Workflows and automation |
+| `security/` | Security fix |
 
-    Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md) and include:
+### Commit messages
 
-    - Problem statement (what pain point does this solve?)
-    - Proposed solution
-    - Alternatives considered
-    - Which perimeter this affects
+Conventional Commits, signed off, GPG-signed where possible:
 
-### Your First Contribution
+```text
+type(scope): short description
 
-    Look for issues labelled:
+What changed and why. Wrap at 72 columns.
 
-    - [`good first issue`](https://github.com/hyperpolymath/ipv6-tools/labels/good%20first%20issue) — Simple Perimeter 3 tasks
-    - [`help wanted`](https://github.com/hyperpolymath/ipv6-tools/labels/help%20wanted) — Community help needed
-    - [`documentation`](https://github.com/hyperpolymath/ipv6-tools/labels/documentation) — Docs improvements
-    - [`perimeter-3`](https://github.com/hyperpolymath/ipv6-tools/labels/perimeter-3) — Community sandbox scope
+Closes #123
+```
 
-    ---
+Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `style`,
+`chore`, `ci`, `security`.
 
-## Development Workflow
+## Documentation format
 
-### Branch Naming
+AsciiDoc is the canonical documentation format. Write new documents as
+`.adoc`. Markdown is permitted only where a platform or tool requires it —
+`.github/CONTRIBUTING.md` (this file), issue templates, and agent configs
+such as `CLAUDE.md`.
 
-docs/short-description # Documentation (P3) test/what-added # Test
-additions (P3) feat/short-description # New features (P2)
-fix/issue-number-description # Bug fixes (P2) refactor/what-changed #
-Code improvements (P2) security/what-fixed # Security fixes (P1-2)
+`just docs-format` enforces this, and the Dogfood Gate runs the same check
+on pull requests. The full rule, the exception list, and the migration
+record live in
+[`docs/documentation-format-policy.adoc`](../docs/documentation-format-policy.adoc).
 
+## Reporting bugs and requesting features
 
-### Commit Messages
+Open an issue at <https://github.com/hyperpolymath/ipv6-tools/issues/new>.
+Include a clear title, your environment (OS, Rust/Kubernetes versions,
+`ipv6-only` or `ipv6-site-enforcer`), steps to reproduce, expected versus
+actual behaviour, and a minimal reproduction or log excerpt.
 
-    We follow [Conventional Commits](https://www.conventionalcommits.org/):
+Search existing issues first, and report security problems privately via
+<https://github.com/hyperpolymath/ipv6-tools/security/advisories/new> — see
+[`SECURITY.adoc`](../SECURITY.adoc).
 
-type(scope): description
+## Perimeter model
 
-Body: what changed and why.
+This repository follows the Tri-Perimeter Contribution Framework (TPCF):
 
-Footer: issue reference, e.g. Closes #123
-\[optional body\]
+- **Perimeter 1 — core**: the release-blocking surface (`ipv6-only`
+  core/subnet crates, CI, licensing). Changes need maintainer review.
+- **Perimeter 2 — trusted**: tooling around the core (workflows, hooks,
+  deployment manifests). Review by a trusted contributor.
+- **Perimeter 3 — community sandbox**: documentation, examples, and
+  experiments. Open to any contributor.
 
-\[optional footer\]
+Good first issues are labelled `good first issue`; help is welcome on
+anything labelled `help wanted`.
+
+## Licence
+
+Contributions are licensed under MPL-2.0 (see [`LICENSE`](../LICENSE));
+prose and documentation are CC-BY-SA-4.0.
