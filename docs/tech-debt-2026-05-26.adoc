@@ -53,6 +53,20 @@ Additionally: *CHANGELOG.md is missing.* 65% of estate repos lack one —
 adopting a CHANGELOG (or auto-generating via `+git-cliff+`) is a
 recommended estate-wide follow-up.
 
+=== Status at 2026-09-29
+
+The findings above are the raw 2026-05-26 scan and are kept verbatim; the
+filenames in section 3 are the ones the scan probed, not today’s tree.
+
+.Proof debt:: unchanged — no proof-bearing sources, and none recommended.
+.Licence debt:: unchanged — `+MPL-2.0+`.
+.Documentation debt:: *closed.* The stub README has been expanded and
+rewritten in AsciiDoc; `+CHANGELOG.adoc+` exists and is maintained;
+`+docs/+` now holds this file and the
+link:documentation-format-policy.adoc[documentation format policy]; and the
+Markdown → AsciiDoc migration is complete, so the community-health files
+are `+*.adoc+` (with Markdown retained only where GitHub requires it).
+
 === Cross-references
 
 * Estate proof-debt audit:

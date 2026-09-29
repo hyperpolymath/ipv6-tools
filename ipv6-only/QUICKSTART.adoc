@@ -273,10 +273,10 @@ just test-coverage
 === Documentation
 
 * *README*: Overview and installation
-* *Tutorial*: `+docs/TUTORIAL.md+` - Comprehensive guide
-* *IPv6 Primer*: `+docs/IPv6_PRIMER.md+` - Learn IPv6 basics
+* *Tutorial*: `+docs/TUTORIAL.adoc+` - Comprehensive guide
+* *IPv6 Primer*: `+docs/IPv6_PRIMER.adoc+` - Learn IPv6 basics
 * *API Docs*: `+cargo doc --open+`
-* *Contributing*: `+CONTRIBUTING.md+`
+* *Contributing*: `+CONTRIBUTING.adoc+`
 
 === Getting Help
 
@@ -287,8 +287,8 @@ just test-coverage
 === Next Steps
 
 [arabic]
-. Read the link:docs/TUTORIAL.md[Tutorial] for detailed examples
-. Check out the link:docs/IPv6_PRIMER.md[IPv6 Primer] to learn more
+. Read the link:docs/TUTORIAL.adoc[Tutorial] for detailed examples
+. Check out the link:docs/IPv6_PRIMER.adoc[IPv6 Primer] to learn more
 . Explore the library API with `+cargo doc --open+`
 . Set up the pre-commit hooks with `+just install-hooks+`
 

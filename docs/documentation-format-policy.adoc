@@ -1,0 +1,141 @@
+// SPDX-License-Identifier: MPL-2.0
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Documentation Format Policy
+:toc: left
+:toclevels: 3
+
+AsciiDoc is the canonical documentation format for `+ipv6-tools+`. This
+page records the rule, the exceptions, and the completion of the
+Markdown → AsciiDoc migration.
+
+== The rule
+
+Every human-facing document — README, governance, policies, guides,
+changelogs, design notes — is authored in AsciiDoc (`+.adoc+`).
+
+Markdown (`+.md+`) is permitted *only* at the paths listed in
+<<exceptions>>, and only because a tool or platform requires Markdown by
+name. Nothing else may be Markdown.
+
+== Why AsciiDoc
+
+* One format for prose and code samples: no fenced-code ambiguity, real
+  admonitions, real tables, real includes.
+* Native footnote, cross-reference, and table-of-contents support without
+  HTML escapes.
+* Consistent with the wider hyperpolymath estate, which standardised on
+  AsciiDoc for repository documentation.
+
+== Exceptions
+
+[cols="3,5",options="header"]
+|===
+|Path pattern |Why Markdown is required
+
+|`+.github/CONTRIBUTING.md+`
+|GitHub's Community Standards checklist only detects Markdown for
+community-health files. GitHub renders AsciiDoc but does not count it as a
+community-health file; hyperpolymath has asked upstream to accept it —
+https://github.com/orgs/community/discussions/181843[community discussion
+#181843] and
+https://github.com/orgs/community/discussions/189645[community discussion
+#189645]. The AsciiDoc summary in `+CONTRIBUTING.adoc+` points here, so a
+prose overview is always available in the canonical format. The same
+rationale applies to any `+.github/CODE_OF_CONDUCT.md+` or
+`+.github/SECURITY.md+` retained by a repository.
+
+|`+**/ISSUE_TEMPLATE/*.md+`
+|GitHub issue templates accept Markdown or YAML only; `.adoc` is not a
+supported template format.
+
+|`+**/CLAUDE.md+`, `+**/.claude/*.md+`, `+**/GEMINI.md+`, `+**/AGENTS.md+`
+|Agent-configuration filenames are fixed by the tools that read them.
+
+|`+CHANGELOG.md+` (legacy)
+|Only kept if an external tool insists on writing Markdown. The canonical
+changelog here is `+CHANGELOG.adoc+`.
+|===
+
+== Migration status: complete (2026-09-29)
+
+The estate-wide migration landed in
+https://github.com/hyperpolymath/ipv6-tools/pull/53[#53] (2026-08-24). This
+repository is now *complete*: no unconverted Markdown remains, and the
+residue of the migration has been repaired.
+
+What the migration converted: every root document (`+README+`,
+`+CHANGELOG+`, `+CODE_OF_CONDUCT+`, `+CONTRIBUTING+`, `+GOVERNANCE+`,
+`+REQUIRES_INITIALISATION+`, `+SECURITY+`, `+TEST-NEEDS+`, `+TOPOLOGY+`),
+the tiered quickstarts, the agent warm-up files, `+docs/+`, and the
+vendored `+ipv6-only/+` and `+ipv6-site-enforcer/+` trees.
+
+The 2026-09-29 completion pass:
+
+* repointed every reference that still named a converted `+.md+` file
+  (`+docs/tech-debt-2026-05-26.md+`, `+CHANGELOG.md+`, `+README.md+`,
+  `+CODE_OF_CONDUCT.md+`, `+SECURITY.md+`, `+CONTRIBUTING.md+`,
+  `+MAINTAINERS.md+`, `+docs/IPv6_PRIMER.md+`, `+docs/TUTORIAL.md+`, and
+  the `+REQUIRES_INITIALISATION.md+` pointer in `+0-AI-MANIFEST.a2ml+`);
+* repaired the two contributing guides whose conversion had mangled them
+  (`+.github/CONTRIBUTING.md+` and
+  `+ipv6-site-enforcer/CONTRIBUTING.adoc+`), including the repository
+  structure trees, which described directories this repository does not
+  have;
+* moved the tooling off Markdown: `+just changelog+` now writes
+  `+CHANGELOG.adoc+`, and the pages workflow detects `+README.adoc+` first;
+* added the guard described in <<enforcement>> so the policy cannot
+  silently regress.
+
+Remaining Markdown is exactly the allowlist in <<exceptions>>:
+
+[cols="3,2",options="header"]
+|===
+|File |Exception
+
+|`+.github/CONTRIBUTING.md+` |GitHub community health
+|`+ipv6-only/CLAUDE.md+` |Claude agent config
+|`+ipv6-only/.claude/CLAUDE.md+` |Claude agent config
+|`+ipv6-site-enforcer/.claude/CLAUDE.md+` |Claude agent config
+|`+ipv6-only/.github/ISSUE_TEMPLATE/bug_report.md+` |Issue template
+|`+ipv6-only/.github/ISSUE_TEMPLATE/custom.md+` |Issue template
+|`+ipv6-only/.github/ISSUE_TEMPLATE/documentation.md+` |Issue template
+|`+ipv6-only/.github/ISSUE_TEMPLATE/feature_request.md+` |Issue template
+|`+ipv6-only/.github/ISSUE_TEMPLATE/question.md+` |Issue template
+|===
+
+Note that `+bug_report.md+` and `+feature_request.md+` duplicate
+`+bug_report.yml+` and `+feature_request.yml+` in the same directory; the
+YAML forms are the canonical ones and the Markdown duplicates are queued
+for removal when the vendored `+ipv6-only+` tree is next synced with its
+upstream repository.
+
+== Enforcement
+
+[source,bash]
+----
+just docs-format              # local check
+bash scripts/check-doc-format.sh
+----
+
+`+scripts/check-doc-format.sh+` fails when:
+
+. a Markdown file exists outside the allowlist;
+. a document references a repository-local `+.md+` path that has been
+  converted to `+.adoc+` (a provably stale link);
+. an `+.adoc+` file contains Markdown inline-link syntax, which AsciiDoc
+  renders literally.
+
+The Dogfood Gate (`.github/workflows/dogfood-gate.yml`) runs the same
+script on every pull request, so a violation fails CI rather than being
+caught in review.
+
+== Authoring a document
+
+. Write AsciiDoc; use the https://docs.asciidoctor.org/asciidoc/latest/[AsciiDoc Language Documentation] as the reference.
+. Start the file with an SPDX header (`+// SPDX-License-Identifier: MPL-2.0+` for code-adjacent docs, `+CC-BY-SA-4.0+` for prose).
+. Give the document a level-0 title (`+= Title+=`), then use `+==+` sections.
+. Cross-reference other documents with `+xref:path/to/doc.adoc[Label]+` or `+link:...[]+`.
+. If Markdown is genuinely unavoidable, add the path to *both* the
+  <<exceptions>> table here and `+allow_md+` in
+  `+scripts/check-doc-format.sh+`, with the reason, in the same pull
+  request.

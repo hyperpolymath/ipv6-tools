@@ -123,7 +123,7 @@ body:
       options:
         - label: I have searched for existing feature requests
           required: true
-        - label: I have read the [Contributing Guidelines](../CONTRIBUTING.md)
+        - label: I have read the [Contributing Guidelines](../CONTRIBUTING.adoc)
           required: true
         - label: This feature aligns with the project goals
           required: true

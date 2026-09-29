@@ -4,6 +4,11 @@
 Thank you for your interest in contributing to `ipv6-tools`.
 See link:.github/CONTRIBUTING.md[.github/CONTRIBUTING.md] for the full Tri-Perimeter Contribution Framework (TPCF) guide.
 
+Documents are written in AsciiDoc; Markdown is kept only where a platform
+requires it. The rule, the exception list, and the migration record are in
+link:docs/documentation-format-policy.adoc[the documentation format policy],
+and `+just docs-format+` checks it locally.
+
 == Quick Start
 
 [source,bash]
