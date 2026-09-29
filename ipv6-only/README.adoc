@@ -70,8 +70,8 @@ ipv6-only/
 +-- config/
 |   +-- ipv6-tools.ncl   # Nickel configuration
 +-- docs/
-    +-- IPv6_PRIMER.md   # Educational content
-    +-- TUTORIAL.md      # Usage tutorial
+    +-- IPv6_PRIMER.adoc # Educational content
+    +-- TUTORIAL.adoc    # Usage tutorial
 ----
 
 == Installation
@@ -324,8 +324,8 @@ The project uses Nickel for configuration. See `config/ipv6-tools.ncl`:
 
 == Documentation
 
-* link:docs/IPv6_PRIMER.md[IPv6 Primer] - Comprehensive IPv6 introduction
-* link:docs/TUTORIAL.md[Tutorial] - Step-by-step usage guide
+* link:docs/IPv6_PRIMER.adoc[IPv6 Primer] - Comprehensive IPv6 introduction
+* link:docs/TUTORIAL.adoc[Tutorial] - Step-by-step usage guide
 * link:ROADMAP.adoc[Roadmap] - Development roadmap
 
 == Development

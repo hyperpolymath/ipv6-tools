@@ -39,8 +39,11 @@ cd ../ipv6-site-enforcer/ && just build && just run -- example.com
 the estate licence-debt audit, hyperpolymath/standards#196.)
 * *Estate role*: infrastructure tooling — consumed by deployment
 workflows where IPv6 readiness is a hard requirement.
-* *Audit findings*: see `+docs/tech-debt-2026-05-26.md+` if present
+* *Audit findings*: see `+docs/tech-debt-2026-05-26.adoc+` if present
 (added by the 2026-05-26 estate tech-debt scan).
+* *Documentation format*: AsciiDoc. The Markdown → AsciiDoc migration is
+complete; the Markdown that remains is a documented exception — see
+`+docs/documentation-format-policy.adoc+`.
 
 == Contributing
 

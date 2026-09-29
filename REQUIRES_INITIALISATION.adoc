@@ -65,7 +65,7 @@ member`'.
 
 Appears in:
 
-* `+CODE_OF_CONDUCT.md+`
+* `+CODE_OF_CONDUCT.adoc+`
 
 ==== `+{{CONSUMER1}}+`
 
@@ -161,7 +161,7 @@ PGP_FINGERPRINT.
 
 Appears in:
 
-* `+SECURITY.md+`
+* `+SECURITY.adoc+`
 
 ==== `+{{PROJECT_UNIQUE_STRENGTH}}+`
 
@@ -178,7 +178,7 @@ a solo maintainer can actually meet.
 
 Appears in:
 
-* `+CODE_OF_CONDUCT.md+`
+* `+CODE_OF_CONDUCT.adoc+`
 
 ==== `+{{TEST_CMD}}+`
 

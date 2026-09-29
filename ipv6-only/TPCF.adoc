@@ -238,10 +238,10 @@ violations, security incidents, or extended inactivity (with warning).
 
 === Related Documents
 
-* *CODE_OF_CONDUCT.md*: Community standards
-* *CONTRIBUTING.md*: How to contribute
-* *MAINTAINERS.md*: Current maintainers
-* *security.md*: Security policies
+* *CODE_OF_CONDUCT.adoc*: Community standards
+* *CONTRIBUTING.adoc*: How to contribute
+* *MAINTAINERS.adoc*: Current maintainers
+* *security.adoc*: Security policies
 
 === References
 
