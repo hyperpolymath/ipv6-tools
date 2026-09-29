@@ -185,7 +185,8 @@ check_sysctl() {
 check_privacy_extensions() {
     print_header "Privacy Extensions Status"
 
-    local use_tempaddr=$(sysctl -n net.ipv6.conf.all.use_tempaddr 2>/dev/null || echo "N/A")
+    local use_tempaddr
+    use_tempaddr=$(sysctl -n net.ipv6.conf.all.use_tempaddr 2>/dev/null || echo "N/A")
 
     case $use_tempaddr in
         0)

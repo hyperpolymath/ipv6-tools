@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: MPL-2.0
+# Gitleaks configuration for hyperpolymath/ipv6-tools
+# Extends the default Gitleaks ruleset with estate baseline allowlists and
+# repo-specific false-positive suppressions (Kubernetes ConfigMap key names).
+
+title = "hyperpolymath/ipv6-tools gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Estate baseline + Kubernetes ConfigMap key reference allowlist"
+regexTarget = "line"
+paths = [
+  '''(^|/)tests?(/|$)''',
+  '''(^|/)test[_-]fixtures?(/|$)''',
+  '''(^|/)fixtures?(/|$)''',
+  '''(^|/)testdata(/|$)''',
+  '''(^|/)__tests__(/|$)''',
+  '''(^|/)__mocks__(/|$)''',
+  '''(^|/)spec(/|$)''',
+  '''(^|/)examples?(/|$)''',
+  '''(^|/)samples?(/|$)''',
+  '''(^|/)benchmarks?(/|$)''',
+  '''(^|/)benches(/|$)''',
+  '''(^|/)fuzz(/|$)''',
+  '''\.test\.[^/]+$''',
+  '''\.spec\.[^/]+$''',
+  '''_test\.(go|rs|py|ex|exs|gleam|res|ml|zig)$''',
+  '''(^|/)docs?(/|$)''',
+  '''\.(md|adoc|rst|txt)$''',
+  '''(^|/)(Cargo\.lock|deno\.lock|flake\.lock|mix\.lock|gleam\.toml|rebar\.lock|opam\.locked)$''',
+  '''\.(snap|golden)$''',
+  '''(^|/)\.machine_readable(/|$)''',
+  '''(^|/)\.gitleaks\.toml$''',
+]
+regexes = [
+  '''(?i)(example|placeholder|changeme|replace[_-]?me|your[_-]?(api[_-]?)?(key|token|secret)|dummy|fake|mock|sample|test[_-]?(key|token|secret)|todo|xxx+|00000000|11111111|deadbeef|cafebabe)''',
+  '''https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|example\.(com|org|net))''',
+  '''configMapKeyRef:''',
+  '''key:\s*nat64-prefix''',
+]
+stopwords = [
+  "example",
+  "placeholder",
+  "changeme",
+  "dummy",
+  "fake",
+  "mock",
+  "sample",
+  "test",
+  "fixture",
+  "nat64-prefix",
+]

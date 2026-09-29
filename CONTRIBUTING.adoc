@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: MPL-2.0
+= Contributing to ipv6-tools
+
+Thank you for your interest in contributing to `ipv6-tools`.
+See link:.github/CONTRIBUTING.md[.github/CONTRIBUTING.md] for the full Tri-Perimeter Contribution Framework (TPCF) guide.
+
+== Quick Start
+
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/ipv6-tools.git
+cd ipv6-tools
+just quality
+just validate
+----
+
+== Guidelines
+
+* Follow Conventional Commits (`type(scope): description`).
+* Sign off commits (`git commit -s`).
+* Ensure `cargo fmt --all -- --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, and `cargo audit --deny warnings` pass in `ipv6-only/`.
+* All code contributions are licensed under MPL-2.0.

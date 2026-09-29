@@ -1,20 +1,17 @@
 # SPDX-License-Identifier: MPL-2.0
-# IPv6-Site-Enforcer — Service Definition.
-#
-# This manifest exposes the NAT64/DNS64 gateway within the cluster. 
-# It provides a stable internal IP for the DNS64 synthesis service.
-
 apiVersion: v1
 kind: Service
 metadata:
   name: ipv6-site-enforcer
   namespace: ipv6-enforcer
+  labels:
+    app.kubernetes.io/name: ipv6-site-enforcer
+    app.kubernetes.io/part-of: flatracoon
 spec:
-  type: ClusterIP # Internal load-balancing.
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: ipv6-site-enforcer
   ports:
-    # DNS: Standard ports for recursive resolution.
     - name: dns-udp
       port: 53
       targetPort: dns-udp
@@ -23,7 +20,6 @@ spec:
       port: 53
       targetPort: dns-tcp
       protocol: TCP
-    # OBSERVABILITY: Metrics and health status.
     - name: health
       port: 8080
       targetPort: health

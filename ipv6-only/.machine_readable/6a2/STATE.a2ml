@@ -1,38 +1,35 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
-#
-# STATE.a2ml — Ipv6 Only project state
+# STATE.a2ml — ipv6-only project state
+
 [metadata]
 project = "ipv6-only"
-version = "0.0.1"
-last-updated = "2026-01-03"
+version = "0.1.0"
+last-updated = "2026-09-29"
 status = "active"
-session = "converted from scheme — 2026-04-11"
 
 [project-context]
-name = "Ipv6 Only"
-purpose = """"""
-completion-percentage = 0
+name = "ipv6-only"
+purpose = "Rust-based IPv6 address manipulation, subnet calculation, EUI-64/ULA/link-local generation, and network planning toolkit."
+completion-percentage = 100
 
 [position]
-phase = "initial"   # design | implementation | testing | maintenance | archived
-maturity = "experimental"  # experimental | alpha | beta | production | lts
+phase = "maintenance"
+maturity = "production"
 
 [route-to-mvp]
 milestones = [
-  # No milestones recorded
+  { name = "Core IPv6Address and IPv6Network types (ipv6-only-core)", completion = 100 },
+  { name = "Subnet division, supernetting, and department allocation (ipv6-only-subnet)", completion = 100 },
+  { name = "Address compression, expansion, reverse DNS, and ULA/EUI-64 generation (ipv6-only-utils)", completion = 100 },
+  { name = "Resolve hyperpolymath/ipv6-only#67 (upgrade rand 0.10.2 / chacha20 0.10.2 / clap 4.6.6 / thiserror 2.0.18)", completion = 100 },
 ]
 
 [blockers-and-issues]
-issues = [
-  # No blockers recorded
-]
+issues = []
 
 [critical-next-actions]
-actions = [
-  # No actions recorded
-]
+actions = []
 
 [maintenance-status]
-last-run-utc = "2026-01-03T00:00:00Z"
-last-result = "unknown"  # unknown | pass | warn | fail
+last-run-utc = "2026-09-29T00:00:00Z"
+last-result = "pass"

@@ -1,11 +1,26 @@
 # SPDX-License-Identifier: MPL-2.0
 name: Container Policy
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+# Estate guardrail: scope push to default branches (PR fires once, not
+# push+PR) and cancel superseded runs. Safe — read-only PR check.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: read-all
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Enforce container policy
         run: |
           # Block new Dockerfiles
@@ -14,12 +29,12 @@ jobs:
             echo "❌ New Dockerfile detected. Use Containerfile instead."
             exit 1
           fi
-          
+
           # Check for docker command usage in scripts
           DOCKER_CMD=$(grep -r "docker build\|docker run\|docker push" --include="*.sh" --include="*.yml" --include="*.yaml" . 2>/dev/null | grep -v "nerdctl\|podman" | head -5 || true)
           if [ -n "$DOCKER_CMD" ]; then
             echo "⚠️ docker command found. Prefer nerdctl or podman:"
             echo "$DOCKER_CMD"
           fi
-          
+
           echo "✅ Container policy check passed"

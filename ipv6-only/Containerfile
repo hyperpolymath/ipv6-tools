@@ -3,7 +3,15 @@
 # Based on Chainguard Wolfi for minimal attack surface
 
 # Build stage
-FROM cgr.dev/chainguard/rust:latest AS builder
+FROM cgr.dev/chainguard/wolfi-base:latest AS builder
+
+# Install Rust and build dependencies. On the Chainguard wolfi apk repo the
+# `cargo` binary ships inside the `rust` package (there is no standalone
+# `cargo` package — `apk add cargo` fails with "no such package"), so it is
+# not listed separately here.
+RUN apk add --no-cache \
+    rust \
+    build-base
 
 WORKDIR /build
 
@@ -18,7 +26,7 @@ RUN cargo build --release
 # Runtime stage
 FROM cgr.dev/chainguard/wolfi-base:latest
 
-LABEL maintainer="IPv6-Only Project <ipv6@hyperpolymath.org>"
+LABEL maintainer="Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
 LABEL description="IPv6-only networking tools written in Rust"
 LABEL org.opencontainers.image.source="https://github.com/hyperpolymath/ipv6-only"
 LABEL org.opencontainers.image.description="Comprehensive IPv6-only networking toolkit"
@@ -30,8 +38,10 @@ RUN apk add --no-cache \
     iproute2 \
     iputils \
     bind-tools \
+    tcpdump \
     curl \
-    ca-certificates
+    ca-certificates \
+    bash
 
 # Create non-root user
 RUN adduser -D -u 1000 ipv6tools

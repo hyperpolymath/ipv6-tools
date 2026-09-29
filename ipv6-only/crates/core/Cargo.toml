@@ -2,6 +2,10 @@
 name = "ipv6-only-core"
 version = "0.1.0"
 edition = "2021"
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
+description = "Core IPv6 address and network types, parsing, and validation"
+license = "MPL-2.0"
+repository = "https://github.com/hyperpolymath/ipv6-only"
 
 [dependencies]
 thiserror = { workspace = true }

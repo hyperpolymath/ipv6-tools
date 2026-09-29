@@ -179,7 +179,8 @@ show_config() {
     echo ""
 
     echo "IPv6 Status:"
-    local disabled=$(sysctl -n net.ipv6.conf.all.disable_ipv6 2>/dev/null || echo "unknown")
+    local disabled
+    disabled=$(sysctl -n net.ipv6.conf.all.disable_ipv6 2>/dev/null || echo "unknown")
     if [ "$disabled" = "0" ]; then
         echo "  ✓ IPv6 is ENABLED"
     else
