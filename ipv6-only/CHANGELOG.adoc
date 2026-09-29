@@ -8,11 +8,24 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 === [Unreleased]
 
+==== Security
+
+* Resolved `hyperpolymath/ipv6-only#67` ("Security: Dependency vulnerabilities detected"):
+** Upgraded `rand` to `0.10` (`0.10.2`) and `chacha20` to `0.10.2` (replacing yanked `chacha20 0.10.1` and eliminating `zerocopy`/`ppv-lite86` transitive dependencies).
+** Upgraded `clap` to `4.6.6`, `anstream` to `1.0.0`, and `thiserror` to `2.0.18`.
+** Added `#![forbid(unsafe_code)]` across all workspace crates (`ipv6-only`, `ipv6-only-core`, `ipv6-only-subnet`, `ipv6-only-utils`).
+** Added automatic issue closure to `Cargo Audit` workflow (`cargo-audit.yml`) when `cargo audit --deny warnings` succeeds.
+
 ==== Added
 
 * Mustfile.epx for deployment state management
 * Pre-commit hook script for RSR compliance
 * Makefile prohibition enforcement in CI
+
+==== Fixed
+
+* Fixed `/0` prefix length `u128` bitshift/addition overflow in `IPv6Network::num_addresses` and `IPv6Network::overlaps`.
+* Fixed `rustfmt` and `clippy` compliance across workspace crates and ShellCheck `SC2155` in diagnostic scripts.
 
 ==== Changed
 

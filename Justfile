@@ -46,7 +46,7 @@ info:
     @echo "Version: {{version}}"
     @echo "RSR Tier: {{tier}}"
     @echo "Recipes: $(just --summary | wc -w)"
-    @[ -f ".machine_readable/STATE.a2ml" ] && grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/STATE.a2ml | head -1 | xargs -I{} echo "Phase: {}" || true
+    @[ -f ".machine_readable/descriptiles/STATE.a2ml" ] && grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/descriptiles/STATE.a2ml | head -1 | xargs -I{} echo "Phase: {}" || true
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # BUILD & COMPILE
@@ -55,24 +55,24 @@ info:
 # Build the project (debug mode)
 build *args:
     @echo "Building {{project}} (debug)..."
-    # TODO: Replace with your build command
+    cargo build --manifest-path ipv6-only/Cargo.toml {{args}}
     @echo "Build complete"
 
 # Build in release mode with optimizations
 build-release *args:
     @echo "Building {{project}} (release)..."
-    # TODO: Replace with your release build command
+    cargo build --release --manifest-path ipv6-only/Cargo.toml {{args}}
     @echo "Release build complete"
 
 # Build and watch for changes (requires entr or similar)
 build-watch:
     @echo "Watching for changes..."
-    # TODO: Customize file patterns for your language
+    cargo watch --manifest-path ipv6-only/Cargo.toml -x build
 
 # Clean build artifacts [reversible: rebuild with `just build`]
 clean:
     @echo "Cleaning..."
-    rm -rf target/ _build/ build/ dist/ out/ obj/ bin/
+    rm -rf target/ ipv6-only/target/ _build/ build/ dist/ out/ obj/ bin/
 
 # Deep clean including caches [reversible: rebuild]
 clean-all: clean
@@ -85,18 +85,18 @@ clean-all: clean
 # Run all tests
 test *args:
     @echo "Running tests..."
-    # TODO: Replace with your test command
+    cargo test --manifest-path ipv6-only/Cargo.toml {{args}}
     @echo "Tests passed!"
 
 # Run tests with verbose output
 test-verbose:
     @echo "Running tests (verbose)..."
-    # TODO: Replace with verbose test command
+    cargo test --manifest-path ipv6-only/Cargo.toml -- --nocapture
 
 # Smoke test
 test-smoke:
     @echo "Smoke test..."
-    # TODO: Add basic sanity checks
+    cargo test --manifest-path ipv6-only/Cargo.toml --lib
 
 # Run all quality checks
 quality: fmt-check lint test
@@ -113,17 +113,17 @@ fix: fmt
 # Format all source files [reversible: git checkout]
 fmt:
     @echo "Formatting source files..."
-    # TODO: Replace with your formatter
+    cargo fmt --manifest-path ipv6-only/Cargo.toml --all
 
 # Check formatting without changes
 fmt-check:
     @echo "Checking formatting..."
-    # TODO: Replace with your format check
+    cargo fmt --manifest-path ipv6-only/Cargo.toml --all -- --check
 
 # Run linter
 lint:
     @echo "Linting source files..."
-    # TODO: Replace with your linter
+    cargo clippy --manifest-path ipv6-only/Cargo.toml --all-targets -- -D warnings
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # RUN & EXECUTE
@@ -131,18 +131,16 @@ lint:
 
 # Run the application
 run *args: build
-    # TODO: Replace with your run command
-    echo "Run not configured yet"
+    cargo run --manifest-path ipv6-only/Cargo.toml -- {{args}}
 
 # Run with verbose output
 run-verbose *args: build
-    # TODO: Replace with verbose run command
-    echo "Run not configured yet"
+    RUST_LOG=debug cargo run --manifest-path ipv6-only/Cargo.toml -- {{args}}
 
 # Install to user path
 install: build-release
     @echo "Installing {{project}}..."
-    # TODO: Replace with your install command
+    cargo install --path ipv6-only
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCIES
@@ -151,12 +149,13 @@ install: build-release
 # Install/check all dependencies
 deps:
     @echo "Checking dependencies..."
-    # TODO: Replace with your dependency check
+    cargo metadata --manifest-path ipv6-only/Cargo.toml --format-version 1 >/dev/null
     @echo "All dependencies satisfied"
 
 # Audit dependencies for vulnerabilities
 deps-audit:
     @echo "Auditing for vulnerabilities..."
+    @command -v cargo-audit >/dev/null && (cd ipv6-only && cargo audit --deny warnings) || true
     @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL --quiet . || true
     @command -v gitleaks >/dev/null && gitleaks detect --source . --no-git --quiet || true
     @echo "Audit complete"
@@ -285,7 +284,7 @@ validate-rsr:
     for f in .editorconfig .gitignore Justfile README.adoc LICENSE; do
         [ -f "$f" ] || MISSING="$MISSING $f"
     done
-    for f in .machine_readable/STATE.a2ml .machine_readable/META.a2ml .machine_readable/ECOSYSTEM.a2ml; do
+    for f in .machine_readable/descriptiles/STATE.a2ml .machine_readable/descriptiles/META.a2ml .machine_readable/descriptiles/ECOSYSTEM.a2ml; do
         [ -f "$f" ] || MISSING="$MISSING $f"
     done
     if [ -n "$MISSING" ]; then
@@ -296,12 +295,12 @@ validate-rsr:
 
 # Validate STATE.a2ml syntax
 validate-state:
-    @if [ -f ".machine_readable/STATE.a2ml" ]; then \
-        grep -q '^\[metadata\]' .machine_readable/STATE.a2ml && \
-        grep -q 'project\s*=' .machine_readable/STATE.a2ml && \
+    @if [ -f ".machine_readable/descriptiles/STATE.a2ml" ]; then \
+        grep -q '^\[metadata\]' .machine_readable/descriptiles/STATE.a2ml && \
+        grep -q 'project\s*=' .machine_readable/descriptiles/STATE.a2ml && \
         echo "STATE.a2ml: valid" || echo "STATE.a2ml: INVALID (missing required sections)"; \
     else \
-        echo "No .machine_readable/STATE.a2ml found"; \
+        echo "No .machine_readable/descriptiles/STATE.a2ml found"; \
     fi
 
 # Full validation suite
@@ -314,14 +313,14 @@ validate: validate-rsr validate-state
 
 # Update STATE.a2ml timestamp
 state-touch:
-    @if [ -f ".machine_readable/STATE.a2ml" ]; then \
-        sed -i 's/last-updated = "[^"]*"/last-updated = "'"$(date +%Y-%m-%d)"'"/' .machine_readable/STATE.a2ml && \
+    @if [ -f ".machine_readable/descriptiles/STATE.a2ml" ]; then \
+        sed -i 's/last-updated = "[^"]*"/last-updated = "'"$(date +%Y-%m-%d)"'"/' .machine_readable/descriptiles/STATE.a2ml && \
         echo "STATE.a2ml timestamp updated"; \
     fi
 
 # Show current phase from STATE.a2ml
 state-phase:
-    @grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/STATE.a2ml 2>/dev/null | head -1 || echo "unknown"
+    @grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/descriptiles/STATE.a2ml 2>/dev/null | head -1 || echo "unknown"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # GUIX & NIX

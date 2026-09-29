@@ -1,0 +1,106 @@
+# SPDX-License-Identifier: MPL-2.0
+# Prevention workflow - audits Rust dependencies for vulnerabilities
+name: Cargo Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+  pull_request:
+    paths:
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca00cfe1dde93 # stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: Find and audit all Cargo projects
+        run: |
+          found=false
+          for toml in $(find . -name "Cargo.toml" -not -path "*/target/*"); do
+            dir=$(dirname "$toml")
+            echo "=== Auditing $dir ==="
+            (cd "$dir" && cargo audit --deny warnings)
+            found=true
+          done
+          if [ "$found" = "false" ]; then
+            echo "No Cargo.toml found - skipping"
+          fi
+
+      - name: Check for unmaintained crates
+        run: |
+          for toml in $(find . -name "Cargo.toml" -not -path "*/target/*"); do
+            dir=$(dirname "$toml")
+            echo "=== Checking unmaintained in $dir ==="
+            (cd "$dir" && cargo audit --deny unmaintained) || echo "::warning::Unmaintained crates found in $dir"
+          done
+
+  create-issue:
+    name: Create Security Issue
+    needs: audit
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Create issue on audit failure
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh issue list --repo ${{ github.repository }} --label "security,dependencies" --state open --json number --jq '.[0].number')
+          if [ -z "$existing" ]; then
+            gh issue create \
+              --repo ${{ github.repository }} \
+              --title "Security: Dependency vulnerabilities detected" \
+              --body "Automated security audit detected vulnerabilities in Rust dependencies.
+
+          **Action required:** Run \`cargo audit\` locally to see details and update affected dependencies.
+
+          [View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" \
+              --label "security,dependencies"
+          else
+            echo "Issue #$existing already exists"
+          fi
+
+  close-issue:
+    name: Close Resolved Security Issue
+    needs: audit
+    if: success() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Close open security audit issue when audit passes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          issues=$(gh issue list \
+            --repo ${{ github.repository }} \
+            --label "security,dependencies" \
+            --state open \
+            --search '"Security: Dependency vulnerabilities detected" in:title' \
+            --json number \
+            --jq '.[].number')
+          for issue in $issues; do
+            gh issue close "$issue" \
+              --repo ${{ github.repository }} \
+              --comment "Automated security audit (\`cargo audit --deny warnings\`) passed at commit \`${{ github.sha }}\` ([workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})). Closing resolved dependency vulnerability issue."
+          done

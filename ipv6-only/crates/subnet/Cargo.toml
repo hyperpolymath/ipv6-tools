@@ -2,6 +2,10 @@
 name = "ipv6-only-subnet"
 version = "0.1.0"
 edition = "2021"
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
+description = "IPv6 subnet calculation, division, and network planning"
+license = "MPL-2.0"
+repository = "https://github.com/hyperpolymath/ipv6-only"
 
 [dependencies]
 ipv6-only-core = { path = "../core" }
