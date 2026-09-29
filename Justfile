@@ -171,6 +171,11 @@ docs:
     just man
     @echo "Documentation generated in docs/"
 
+# Enforce the AsciiDoc-first documentation policy [read-only]
+# See docs/documentation-format-policy.adoc
+docs-format:
+    @bash scripts/check-doc-format.sh
+
 # Generate justfile cookbook documentation
 cookbook:
     #!/usr/bin/env bash
@@ -304,7 +309,7 @@ validate-state:
     fi
 
 # Full validation suite
-validate: validate-rsr validate-state
+validate: validate-rsr validate-state docs-format
     @echo "All validations passed!"
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -393,11 +398,11 @@ status:
 log count="20":
     @git log --oneline -{{count}}
 
-# Generate CHANGELOG.md with git-cliff
+# Generate CHANGELOG.adoc with git-cliff
 changelog:
     @command -v git-cliff >/dev/null || { echo "git-cliff not found — install: cargo install git-cliff"; exit 1; }
-    git cliff --output CHANGELOG.md
-    @echo "Generated CHANGELOG.md"
+    git cliff --output CHANGELOG.adoc
+    @echo "Generated CHANGELOG.adoc"
 
 # Preview changelog for unreleased commits (does not write)
 changelog-preview:
@@ -413,7 +418,7 @@ release-tag version:
         exit 1
     fi
     just changelog
-    git add CHANGELOG.md
+    git add CHANGELOG.adoc
     git commit -m "chore(release): prepare $TAG"
     git tag -a "$TAG" -m "Release $TAG"
     echo "Created tag $TAG — push with: git push origin main --tags"

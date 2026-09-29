@@ -1,109 +1,86 @@
-== Clone the repository
+// SPDX-License-Identifier: MPL-2.0
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Contributing to ipv6-site-enforcer
+:toc: left
+:toclevels: 3
 
-git clone https://github.com/hyperpolymath/ipv6-site-enforcer.git cd
-ipv6-site-enforcer
+`+ipv6-site-enforcer+` is the site-level half of `+ipv6-tools+`: it
+validates that a public-facing site serves IPv6 correctly (AAAA records,
+IPv6 socket bind, HTTP over IPv6) and ships the Kubernetes manifests that
+deploy the check alongside Jool NAT64/DNS64 translation.
 
-== Using Nix (recommended for reproducibility)
+== Getting started
 
-nix develop
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/ipv6-site-enforcer.git
+cd ipv6-site-enforcer
 
-== Or using toolbox/distrobox
+# Reproducible shell
+guix develop
+----
 
-toolbox create ipv6-site-enforcer-dev toolbox enter
-ipv6-site-enforcer-dev # Install dependencies manually
+== Repository layout
 
-== Verify setup
+[source,text]
+----
+ipv6-site-enforcer/
+├── manifests/          # namespace, configmap, deployment, service, networkpolicy
+├── hooks/              # workflow validation hooks (SPDX, SHA pins, permissions)
+├── contractiles/       # MUST/DUST contracts for this component
+├── .machine_readable/  # machine-readable state (a2ml)
+├── .github/workflows/  # codeql, governance, hypatia-scan, mirror, scorecard, secret-scanner
+├── Justfile            # task runner (run `just` for the recipe list)
+├── ipv6-site-enforcer.manifest.ncl   # FlatRacoon module manifest
+├── CODE_OF_CONDUCT.adoc
+├── CONTRIBUTING.adoc   # this file
+├── MAINTAINERS.adoc
+├── PALIMPSEST.adoc
+├── README.adoc
+├── ROADMAP.adoc
+└── SECURITY.adoc
+----
 
-just check # or: cargo check / mix compile / etc. just test # Run test
-suite
+== Everyday commands
 
-....
+[source,bash]
+----
+just            # list recipes
+just validate   # kubectl --dry-run=client over manifests/*.yaml
+just deploy     # apply namespace, configmap, deployment, service, networkpolicy
+just status     # show cluster state for the ipv6-enforcer namespace
+just test-dns64 example.com   # exercise DNS64 resolution from inside the pod
+----
 
-### Repository Structure
-....
+== Making changes
 
-ipv6-site-enforcer/ ├── src/ # Source code (Perimeter 1-2) ├── lib/ #
-Library code (Perimeter 1-2) ├── extensions/ # Extensions (Perimeter 2)
-├── plugins/ # Plugins (Perimeter 2) ├── tools/ # Tooling (Perimeter 2)
-├── docs/ # Documentation (Perimeter 3) │ ├── architecture/ # ADRs,
-specs (Perimeter 2) │ └── proposals/ # RFCs (Perimeter 3) ├── examples/
-# Examples (Perimeter 3) ├── spec/ # Spec tests (Perimeter 3) ├── tests/
-# Test suite (Perimeter 2-3) ├── .well-known/ # Protocol files
-(Perimeter 1-3) ├── .github/ # GitHub config (Perimeter 1) │ ├──
-ISSUE_TEMPLATE/ │ └── workflows/ ├── CHANGELOG.md ├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md # This file ├── GOVERNANCE.md ├── LICENSE ├──
-MAINTAINERS.md ├── README.adoc ├── SECURITY.md ├── flake.nix # Nix flake
-(Perimeter 1) └── Justfile # Task runner (Perimeter 1)
+. Fork the repository and branch from `+main+`.
+. Follow Conventional Commits: `+type(scope): description+`, with a body
+  explaining what changed and why.
+. Sign off every commit (`+git commit -s+`); GPG-signed commits are
+  preferred.
+. Keep manifests declarative: every `+manifests/*.yaml+` change must pass
+  `+just validate+` and keep the container image pinned by digest.
+. Submit a pull request and describe how you validated the change.
 
-....
+== Documentation format
 
----
+AsciiDoc is the canonical documentation format, as it is across the
+`+ipv6-tools+` monorepo. Write new documents as `+.adoc+`; Markdown is
+allowed only where a platform requires it (issue templates, agent
+configs, and any README shim a platform demands). The rule, the exception
+list, and the migration record are in
+link:../docs/documentation-format-policy.adoc[the documentation format
+policy].
 
-## How to Contribute
+== Security
 
-### Reporting Bugs
+Report vulnerabilities privately through
+https://github.com/hyperpolymath/ipv6-site-enforcer/security/advisories/new[GitHub
+Security Advisories] — never in a public issue. See
+link:SECURITY.adoc[SECURITY.adoc] for the disclosure process.
 
-**Before reporting**:
-1. Search existing issues
-2. Check if it's already fixed in `main`
-3. Determine which perimeter the bug affects
+== Licence
 
-**When reporting**:
-
-Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md) and include:
-
-- Clear, descriptive title
-- Environment details (OS, versions, toolchain)
-- Steps to reproduce
-- Expected vs actual behaviour
-- Logs, screenshots, or minimal reproduction
-
-### Suggesting Features
-
-**Before suggesting**:
-1. Check the [roadmap](ROADMAP.md) if available
-2. Search existing issues and discussions
-3. Consider which perimeter the feature belongs to
-
-**When suggesting**:
-
-Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md) and include:
-
-- Problem statement (what pain point does this solve?)
-- Proposed solution
-- Alternatives considered
-- Which perimeter this affects
-
-### Your First Contribution
-
-Look for issues labelled:
-
-- [`good first issue`](https://github.com/hyperpolymath/ipv6-site-enforcer/labels/good%20first%20issue) — Simple Perimeter 3 tasks
-- [`help wanted`](https://github.com/hyperpolymath/ipv6-site-enforcer/labels/help%20wanted) — Community help needed
-- [`documentation`](https://github.com/hyperpolymath/ipv6-site-enforcer/labels/documentation) — Docs improvements
-- [`perimeter-3`](https://github.com/hyperpolymath/ipv6-site-enforcer/labels/perimeter-3) — Community sandbox scope
-
----
-
-## Development Workflow
-
-### Branch Naming
-....
-
-docs/short-description # Documentation (P3) test/what-added # Test
-additions (P3) feat/short-description # New features (P2)
-fix/issue-number-description # Bug fixes (P2) refactor/what-changed #
-Code improvements (P2) security/what-fixed # Security fixes (P1-2)
-
-....
-
-### Commit Messages
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
-....
-
-():
-
-{empty}[optional body]
-
-{empty}[optional footer]
+Contributions are licensed under MPL-2.0 (link:LICENSE[LICENSE]); prose and
+documentation are CC-BY-SA-4.0.

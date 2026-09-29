@@ -106,7 +106,7 @@ Former maintainers who have stepped down but retain honorary status:
 
 * *GitHub Issues*: Bug reports, feature requests
 * *GitHub Discussions*: General questions, ideas
-* *Security*: See SECURITY.md for reporting process
+* *Security*: See security.adoc for reporting process
 
 === Maintainer Guidelines
 
@@ -130,13 +130,13 @@ Former maintainers who have stepped down but retain honorary status:
 * *Confidential*: Keep security issues private
 * *Timely*: Respond within 24 hours
 * *Coordinated*: Follow disclosure timeline
-* *Document*: Update SECURITY.md
+* *Document*: Update security.adoc
 
 ==== Release Process
 
 [arabic]
 . Version bump in Cargo.toml
-. Update CHANGELOG.md
+. Update CHANGELOG.adoc
 . Tag release (vX.Y.Z)
 . Build and test (`+just ci+`)
 . Publish container image
@@ -167,7 +167,7 @@ Maintainers must enforce RSR compliance:
 * TypeScript, Go, Python (except SaltStack), npm, Makefile
 
 PRs with banned languages should be rejected with a pointer to
-CONTRIBUTING.md.
+CONTRIBUTING.adoc.
 
 === Contact
 

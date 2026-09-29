@@ -235,12 +235,41 @@ jobs:
           echo "| Has HTTP server code | ${{ steps.groove.outputs.has_server }} |" >> "$GITHUB_STEP_SUMMARY"
 
   # ---------------------------------------------------------------------------
-  # Job 5: Dogfooding summary
+  # Job 5: Documentation format — AsciiDoc-first policy
+  # ---------------------------------------------------------------------------
+  doc-format:
+    name: Documentation format (AsciiDoc-first)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Check documentation format
+        run: |
+          set +e
+          bash scripts/check-doc-format.sh > /tmp/doc-format.log 2>&1
+          STATUS=$?
+          set -e
+
+          cat /tmp/doc-format.log
+          {
+            echo "## Documentation format"
+            echo ""
+            echo '```'
+            cat /tmp/doc-format.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit "$STATUS"
+
+  # ---------------------------------------------------------------------------
+  # Job 6: Dogfooding summary
   # ---------------------------------------------------------------------------
   dogfood-summary:
     name: Dogfooding compliance summary
     runs-on: ubuntu-latest
-    needs: [a2ml-validate, k9-validate, empty-lint, groove-check]
+    needs: [a2ml-validate, k9-validate, empty-lint, groove-check, doc-format]
     if: always()
 
     steps:

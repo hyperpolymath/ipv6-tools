@@ -55,7 +55,7 @@ This repo contains:
 ```
 ipv6-site-enforcer/
 ├── 0-AI-MANIFEST.a2ml         # THIS FILE (start here)
-├── README.md                   # Project overview
+├── README.adoc                 # Project overview
 ├── [your source files]         # Main code
 ├── .machine_readable/          # SCM files (6 files)
 │   ├── STATE.scm

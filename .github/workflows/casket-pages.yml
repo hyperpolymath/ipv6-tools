@@ -65,10 +65,11 @@ jobs:
             REPO_URL="https://github.com/${{ github.repository }}"
             README_URL=""
 
-            if [ -f README.md ]; then
-              README_URL="${REPO_URL}/blob/${{ github.ref_name }}/README.md"
-            elif [ -f README.adoc ]; then
+            # AsciiDoc-first: prefer README.adoc, fall back to README.md
+            if [ -f README.adoc ]; then
               README_URL="${REPO_URL}/blob/${{ github.ref_name }}/README.adoc"
+            elif [ -f README.md ]; then
+              README_URL="${REPO_URL}/blob/${{ github.ref_name }}/README.md"
             fi
 
             {

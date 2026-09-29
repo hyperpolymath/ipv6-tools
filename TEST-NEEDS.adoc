@@ -1,4 +1,4 @@
-== TEST-NEEDS.md — ipv6-tools
+== TEST-NEEDS.adoc — ipv6-tools
 
 === CRG Grade: C — ACHIEVED 2026-04-04
 

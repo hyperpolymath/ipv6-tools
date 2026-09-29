@@ -44,15 +44,33 @@ placeholder
 
 ==== Changed
 
+* chore(just): `just changelog` now writes `CHANGELOG.adoc` (git-cliff),
+and `just validate` includes the documentation-format check
 * refactor: migrate 6SCM → 6A2 (.scm → .a2ml format)
 
 ==== Documentation
 
+* docs: complete the Markdown → AsciiDoc migration — repoint every stale
+`.md` reference (SECURITY, REQUIRES_INITIALISATION, README, TEST-NEEDS,
+TRUST.contractile, 0-AI-MANIFEST, and the vendored `ipv6-only/` and
+`ipv6-site-enforcer/` trees)
+* docs: add `docs/documentation-format-policy.adoc` — the AsciiDoc-first
+rule, the Markdown exception list, and the migration completion record
+* docs: repair `.github/CONTRIBUTING.md` and
+`ipv6-site-enforcer/CONTRIBUTING.adoc`, which the migration had mangled
+(headings/links flattened, structure trees describing directories that do
+not exist)
+* docs: record the closure of the documentation findings in
+`docs/tech-debt-2026-05-26.adoc`
 * docs: add TEST-NEEDS.md (CRG C)
 * docs: add EXPLAINME.adoc — prove-it file backing README claims
 
 ==== CI
 
+* ci(dogfood): add a Documentation format job that runs
+`scripts/check-doc-format.sh`, so unconverted or stale Markdown fails CI
+* ci(pages): prefer the AsciiDoc README when generating the site source
+(the Markdown fallback remains for repositories that only ship Markdown)
 * ci: redistribute concurrency-cancel guard to read-only check workflows
 (#12)
 * ci: fix nonexistent actions/upload-artifact SHA pin (#8)
@@ -64,7 +82,7 @@ placeholder
 
 Prior commits to this file’s introduction are recorded in git history
 but not formally classified into Keep-a-Changelog sections. To backfill,
-run `+git cliff -o CHANGELOG.md+` locally using the canonical
+run `+git cliff -o CHANGELOG.adoc+` locally using the canonical
 https://github.com/hyperpolymath/standards/blob/main/templates/cliff.toml[`+cliff.toml+`]
 — this is one-shot mechanical work.
 

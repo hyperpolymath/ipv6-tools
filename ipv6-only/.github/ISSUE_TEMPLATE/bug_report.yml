@@ -124,7 +124,7 @@ body:
       options:
         - label: I have searched for existing issues
           required: true
-        - label: I have read the [Contributing Guidelines](../CONTRIBUTING.md)
+        - label: I have read the [Contributing Guidelines](../CONTRIBUTING.adoc)
           required: true
         - label: I am using the latest version
           required: false
