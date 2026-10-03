@@ -33,10 +33,3 @@ updates:
         patterns:
           - "*"
     open-pull-requests-limit: 5
-
-  # Nix flakes
-  - package-ecosystem: "nix"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 2

@@ -15,5 +15,11 @@ permissions:
 
 jobs:
   mirror:
-    uses: hyperpolymath/standards/.github/workflows/mirror-reusable.yml@a9a3281d620bdd195369c9a6f0bc1d661910965a
+    # Held at 84355587, NOT bumped with the other standards callers (#82):
+    # mirror-reusable at a9a3281d verifies each forge's SSH host key against
+    # vars.<FORGE>_SSH_FINGERPRINT and has no default for sourcehut, disroot or
+    # gitea, so those jobs fail before pushing ("Configure a valid
+    # SOURCEHUT_SSH_FINGERPRINT", main run 37130334688) and bitbucket regressed
+    # too. Bump only after the owner sets the fingerprint vars.
+    uses: hyperpolymath/standards/.github/workflows/mirror-reusable.yml@84355587cb2a1f86e6882de83514a32db2646e7a
     secrets: inherit
