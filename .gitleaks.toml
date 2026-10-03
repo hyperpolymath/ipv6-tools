@@ -7,6 +7,11 @@ title = "hyperpolymath/ipv6-tools gitleaks configuration"
 
 [extend]
 useDefault = true
+# Inherit the estate-wide allowlist (staged as .gitleaks-estate.toml by the
+# secret-scanner reusable workflow). This suppresses estate-wide false
+# positives (ML corpora, vendored bundles, conformance vectors, etc.)
+# without widening any single repo's local config.
+path = ".gitleaks-estate.toml"
 
 [allowlist]
 description = "Estate baseline + Kubernetes ConfigMap key reference allowlist"
