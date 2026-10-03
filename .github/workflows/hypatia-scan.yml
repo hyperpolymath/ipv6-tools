@@ -20,4 +20,4 @@ permissions:
 
 jobs:
   hypatia:
-    uses: hyperpolymath/standards/.github/workflows/hypatia-scan-reusable.yml@da2c748aad55c1a1dcba00b60fe4a35017bc6540
+    uses: hyperpolymath/standards/.github/workflows/hypatia-scan-reusable.yml@a9a3281d620bdd195369c9a6f0bc1d661910965a

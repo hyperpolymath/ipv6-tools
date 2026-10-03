@@ -25,3 +25,18 @@ just validate
 * Sign off commits (`git commit -s`).
 * Ensure `cargo fmt --all -- --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, and `cargo audit --deny warnings` pass in `ipv6-only/`.
 * All code contributions are licensed under MPL-2.0.
+
+== Changing GitHub Actions workflows
+
+`.github/workflows/actions.lock` pins every `uses:` in every workflow.
+GitHub refuses to start a workflow whose YAML and lock disagree: the run
+ends as `startup_failure` with zero jobs and no check run, so nothing on
+the pull request says why (issue #82).
+
+* After *any* `uses:` change -- including a Dependabot `github-actions`
+  bump, which rewrites the YAML but cannot touch the lock -- run
+  `+just lock-update+` and commit the regenerated lock in the *same* PR.
+* A new workflow with no `uses:` still needs a lock key with an empty list
+  (`'.github/workflows/<name>.yml': []`); `gh actions-lock` omits it.
+* `+just lock-check+` (offline) is the same check the *Lock Sync Gate*
+  workflow runs on every pull request. Do not merge while it is red.

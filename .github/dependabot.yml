@@ -4,6 +4,15 @@
 version: 2
 updates:
   # GitHub Actions
+  #
+  # Dependabot rewrites `uses:` refs in the workflow YAML but CANNOT regenerate
+  # .github/workflows/actions.lock. Merging such a PR as-is kills every bumped
+  # workflow at startup (startup_failure, zero jobs) -- that is exactly what
+  # #77 did to CodeQL and GitHub Pages (issue #82). The "Lock Sync Gate" check
+  # goes red on these PRs by design: before merging, run `just lock-update` on
+  # the Dependabot branch and push the regenerated lock (the estate's
+  # standards/dependabot-lock-regen.yml does this automatically once its App
+  # credential is installed on this repo).
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
