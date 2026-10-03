@@ -38,12 +38,18 @@ paths = [
   '''\.(snap|golden)$''',
   '''(^|/)\.machine_readable(/|$)''',
   '''(^|/)\.gitleaks\.toml$''',
+  '''(^|/)\.gitleaks-estate\.toml$''',
+  # GitHub Actions workflow files use ${{ secrets.* }} template syntax
+  # that can trigger generic-api-key entropy heuristics on the token names.
+  '''(^|/)\.github/workflows/''',
 ]
 regexes = [
   '''(?i)(example|placeholder|changeme|replace[_-]?me|your[_-]?(api[_-]?)?(key|token|secret)|dummy|fake|mock|sample|test[_-]?(key|token|secret)|todo|xxx+|00000000|11111111|deadbeef|cafebabe)''',
   '''https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|example\.(com|org|net))''',
   '''configMapKeyRef:''',
   '''key:\s*nat64-prefix''',
+  # GitHub Actions template expressions are not real secrets
+  '''\$\{\{.*\}\}''',
 ]
 stopwords = [
   "example",
