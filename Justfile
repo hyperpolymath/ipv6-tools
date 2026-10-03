@@ -247,8 +247,22 @@ container-push registry="ghcr.io/hyperpolymath" tag="latest":
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Run full CI pipeline locally
-ci: deps quality
+ci: deps quality lock-check
     @echo "CI pipeline complete!"
+
+# Same check as the "Lock Sync Gate" workflow. Drift = startup_failure (issue #82).
+# Verify .github/workflows/actions.lock matches the workflow YAML [read-only, offline]
+lock-check:
+    @bash scripts/check-lock-sync.sh
+
+# Uses the same gh-actions-lock pin as the estate governance gate (v0.1.6).
+# A new workflow with no `uses:` needs a hand-added `'<path>': []` key;
+# gh-actions-lock omits it and `just lock-check` will say so.
+# Regenerate actions.lock after ANY `uses:` change (incl. Dependabot bumps)
+lock-update:
+    @gh extension list | grep -q 'gh-actions-lock' || gh extension install github/gh-actions-lock --pin v0.1.6
+    gh actions-lock --no-interactive
+    @bash scripts/check-lock-sync.sh
 
 # Install git hooks
 install-hooks:

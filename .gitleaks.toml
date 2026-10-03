@@ -33,6 +33,24 @@ paths = [
   '''\.(snap|golden)$''',
   '''(^|/)\.machine_readable(/|$)''',
   '''(^|/)\.gitleaks\.toml$''',
+
+  # The SCANNER'S OWN STAGED ARTEFACT -- not an exemption for a file that
+  # "is fine", but the one file the scanner writes into its own scan target.
+  #
+  # The standards secret-scanner reusable copies
+  # `config/gitleaks/estate-baseline.toml` to `.gitleaks-estate.toml` in the
+  # workspace root UNCONDITIONALLY, before the step that decides whether this
+  # repo references it (hyperpolymath/standards#888, still open). That
+  # baseline documents credential SHAPES, so `generic-api-key` fires on it and
+  # the required `scan / gitleaks` context (Secret-Scan-Floor ruleset) goes
+  # red for reasons no commit here caused: 4 findings on
+  # `.gitleaks-estate.toml:84/85/211`, main run 36616834392 (issue #82).
+  #
+  # Anchored `^...$` -- ROOT ONLY. An unanchored `(^|/)` form would also blind
+  # the scanner to a real `src/.gitleaks-estate.toml`; the reusable only ever
+  # writes the file at the root. Same cure as boj-server-cartridges#155.
+  # Remove once standards#888 lands and the caller pin is bumped past it.
+  '''^\.gitleaks-estate\.toml$''',
 ]
 regexes = [
   '''(?i)(example|placeholder|changeme|replace[_-]?me|your[_-]?(api[_-]?)?(key|token|secret)|dummy|fake|mock|sample|test[_-]?(key|token|secret)|todo|xxx+|00000000|11111111|deadbeef|cafebabe)''',

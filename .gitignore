@@ -94,3 +94,6 @@ hooks/playbook-to-recipe/Cargo.lock
 .verisimdb/ecosystem-ingest/Cargo.lock
 # Backup/scratch files (never commit)
 *.backup
+# CI tooling staged into the workspace by standards reusables (never commit)
+/.gitleaks-estate.toml
+/.standards-*/

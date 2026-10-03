@@ -1,0 +1,81 @@
+# This workflow is managed by gh actions-lock.
+# SPDX-License-Identifier: MPL-2.0
+name: Lock Sync Gate
+
+# Fails any pull request whose .github/workflows/actions.lock has drifted from
+# the workflow YAML. That drift is not cosmetic: GitHub refuses such a run at
+# startup, creating ZERO jobs, publishing no check run, and reporting only
+# "This run likely failed because of a workflow file issue."
+#
+# This is the recurrence gate for issue #82. Dependabot #77 bumped
+# haskell-actions/setup and github/codeql-action in the YAML; Dependabot cannot
+# touch actions.lock, so CodeQL and GitHub Pages went to startup_failure and
+# Scorecard + Governance/Actions-lockfile-verify went red, with nothing in the
+# PR's own check list to say why. The same failure had already been repaired
+# by hand three times (#71, #74, #76). See also hyperpolymath/standards#968.
+#
+# DELIBERATELY NO `uses:`. It checks out with git in a `run:` step instead of
+# actions/checkout, so it has no lockfile dependency to go stale and is
+# structurally immune to the very failure it detects. Its lockfile entry is
+# the empty list. Do not add a `uses:` to this file.
+#
+# DELIBERATELY NO `paths:` FILTER. A filtered workflow never reports on pull
+# requests that miss the filter, which deadlocks any ruleset that requires it.
+#
+# Offline check (scripts/check-lock-sync.sh): no network, no gh extension, so
+# it cannot be broken by an upstream release. The authoritative online
+# verifier (`gh actions-lock --verify-local`) still runs in
+# Governance / Actions lockfile verify.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lock-sync-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lock-sync:
+    name: actions.lock is in sync with the workflow YAML
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out without actions/checkout
+        env:
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Header form, so the credential is never written into .git/config.
+          AUTH="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${TOKEN}" | base64 -w0)"
+          git init -q .
+          git remote add origin "https://github.com/${REPO}.git"
+          git -c http.extraheader="${AUTH}" fetch -q --depth 1 origin "${SHA}"
+          git checkout -q FETCH_HEAD
+          echo "checked out ${SHA}"
+
+      - name: Ensure gawk (3-argument match) is available
+        run: |
+          set -euo pipefail
+          if ! command -v gawk >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq gawk >/dev/null
+          fi
+          gawk --version | head -n 1
+
+      - name: Verify lockfile synchronisation
+        run: |
+          set -euo pipefail
+          test -x scripts/check-lock-sync.sh \
+            || { echo "::error::scripts/check-lock-sync.sh missing or not executable"; exit 1; }
+          if ! ./scripts/check-lock-sync.sh; then
+            echo "::error title=actions.lock drift::actions.lock is out of sync with the workflow YAML. Regenerate it with \`just lock-update\` (gh actions-lock, pinned v0.1.6) in the SAME PR as the uses: change - for Dependabot PRs, push the regenerated lock onto the Dependabot branch before merging."
+            exit 1
+          fi
