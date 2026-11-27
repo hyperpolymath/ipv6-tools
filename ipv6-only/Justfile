@@ -3,7 +3,7 @@
 # Task automation for Rust-based IPv6 networking toolkit
 #
 # RSR Policy Compliance:
-#   Allowed: Rust, Deno (JS runtime), ReScript, Bash/POSIX Shell, Nickel
+#   Allowed: Rust, Deno (JS runtime), AffineScript, Bash/POSIX Shell, Nickel
 #   Banned: TypeScript, Node.js, npm, Go, Python (except SaltStack)
 
 # Project metadata

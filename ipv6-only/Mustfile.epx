@@ -44,6 +44,7 @@ podman = { version = ">=4.0.0", optional = true }
 [allowed]
 languages = [
     "rust",
+    "affinescript",
     "rescript",
     "bash",
     "posix-shell",
