@@ -25,7 +25,7 @@ BOT_DIRECTIVES: .bot_directives/
 1. SCM files ONLY in .machine_readable/ (NEVER in root)
 2. All original code uses MPL-2.0 license
 3. Follow RSR template structure
-4. No npm/bun/TypeScript (use Deno/ReScript)
+4. No npm/bun/TypeScript (use Deno/AffineScript)
 5. Workflow permissions: read-all at workflow level
 
 ## Repository Structure
